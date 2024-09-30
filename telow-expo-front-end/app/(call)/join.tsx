@@ -52,6 +52,5 @@ export default function join() {
       <TouchableOpacity onPress={handleJoinRoom}></TouchableOpacity>
     </View>
   );
-
 }
 const styles = StyleSheet.create({});

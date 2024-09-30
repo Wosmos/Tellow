@@ -1,0 +1,138 @@
+{
+  "header": {
+    "logo": "Tellow",
+    "menuItems": ["About", "Features", "Testimonials", "Pricing", "Contact"]
+  },
+  "hero": {
+    "title": "Redefine Connection with Tellow",
+    "subtitle": "Experience the future of video calling - crystal-clear, secure, and effortless.",
+    "cta": "Start Your Journey"
+  },
+  "about": {
+    "title": "About Tellow",
+    "content": "Tellow is more than just a video calling app. It's a revolution in digital communication, seamlessly blending cutting-edge technology with intuitive design to create an unparalleled connection experience. Our mission is to break down barriers and bring people together, no matter the distance."
+  },
+  "features": {
+    "title": "Why Tellow Stands Out",
+    "items": [
+      {
+        "icon": "FaVideo",
+        "title": "Crystal Clear Quality",
+        "description": "Enjoy high-definition video and crisp audio for an immersive calling experience."
+      },
+      {
+        "icon": "FaLock",
+        "title": "Uncompromising Security",
+        "description": "Your calls are protected with state-of-the-art end-to-end encryption, ensuring your privacy."
+      },
+      {
+        "icon": "FaGlobe",
+        "title": "Global Connectivity",
+        "description": "Connect with anyone, anywhere in the world, breaking down geographical barriers."
+      },
+      {
+        "icon": "FaRocket",
+        "title": "Lightning Fast",
+        "description": "Experience minimal lag with our optimized servers and cutting-edge technology."
+      },
+      {
+        "icon": "FaUsers",
+        "title": "Group Calls",
+        "description": "Host large meetings or intimate gatherings with our scalable group call feature."
+      }
+    ]
+  },
+  "testimonials": {
+    "title": "What Our Users Say",
+    "items": [
+      {
+        "name": "Sarah J.",
+        "role": "Remote Team Lead",
+        "content": "Tellow has transformed the way our team collaborates. The video quality is unmatched, and the interface is so intuitive. It's become an indispensable tool for us!"
+      },
+      {
+        "name": "Michael R.",
+        "role": "Global Entrepreneur",
+        "content": "As someone who's constantly connecting with partners worldwide, Tellow's reliability and crystal-clear calls have been a game-changer. It's like being in the same room, no matter the distance."
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "plans": [
+      {
+        "title": "Basic",
+        "price": "Free",
+        "features": [
+          "1-on-1 video calls",
+          "Group calls up to 4 people",
+          "Screen sharing",
+          "24/7 support"
+        ]
+      },
+      {
+        "title": "Pro",
+        "price": "$9.99/mo",
+        "features": [
+          "Everything in Basic",
+          "Group calls up to 50 people",
+          "Recording feature",
+          "Custom backgrounds",
+          "Priority support"
+        ]
+      },
+      {
+        "title": "Enterprise",
+        "price": "Custom",
+        "features": [
+          "Everything in Pro",
+          "Unlimited participants",
+          "Advanced admin controls",
+          "API access",
+          "Dedicated account manager"
+        ]
+      }
+    ]
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "items": [
+      {
+        "question": "Is Tellow free to use?",
+        "answer": "Yes, Tellow offers a free Basic plan with essential features. We also have Pro and Enterprise plans for more advanced needs."
+      },
+      {
+        "question": "How secure are Tellow calls?",
+        "answer": "All Tellow calls are protected with end-to-end encryption, ensuring your conversations remain private and secure."
+      },
+      {
+        "question": "Can I use Tellow on mobile devices?",
+        "answer": "Absolutely! Tellow is available on iOS and Android devices, as well as on desktop browsers."
+      }
+    ]
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "formFields": [
+      {
+        "type": "text",
+        "placeholder": "Your Name",
+        "required": true
+      },
+      {
+        "type": "email",
+        "placeholder": "Your Email",
+        "required": true
+      },
+      {
+        "type": "textarea",
+        "placeholder": "Your Message",
+        "required": true
+      }
+    ],
+    "submitButton": "Send Message"
+  },
+  "footer": {
+    "copyright": "© 2024 Tellow. All rights reserved."
+  }
+}
