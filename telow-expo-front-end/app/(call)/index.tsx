@@ -34,7 +34,7 @@ export default function Page() {
         </TouchableOpacity>
         <View>
           <Dialog.Container visible={dialogOpen}>
-            <Dialog.Title>Account delete</Dialog.Title>
+            <Dialog.Title>Sign Out</Dialog.Title>
             <Dialog.Description>
               Are you sure you want Sign Out?
             </Dialog.Description>

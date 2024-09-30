@@ -15,7 +15,11 @@
     "ios": {
       "supportsTablet": true,
       "bitcode": false,
-      "bundleIdentifier": "com.wosmo.telo"
+      "bundleIdentifier": "com.wosmo.telo",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera for video calls.",
+        "NSMicrophoneUsageDescription": "This app uses the microphone to use audio for video calls "
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -62,10 +66,7 @@
       [
         "react-native-permissions",
         {
-          "iosPermissions": [
-            "camera",
-            "microphone"
-          ]
+          "iosPermissions": ["camera", "microphone"]
         }
       ]
     ],
