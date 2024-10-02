@@ -42,14 +42,52 @@ export default function join() {
   };
 
   return (
-    <View>
-      <Text>Enter the Room name</Text>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        padding: 20,
+        gap: 20,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: 'bold',
+          color: '#000',
+          textAlign: 'center',
+          marginBottom: 20,
+        }}
+      >
+        Enter the Room name
+      </Text>
       <TextInput
+        style={{
+          width: '100%',
+          height: 50,
+          borderWidth: 1,
+          borderColor: '#ccc',
+          borderRadius: 5,
+          padding: 10,
+          fontSize: 16,
+        }}
         placeholder='Join Room'
         value={roomId}
         onChangeText={setRoomId}
       />
-      <TouchableOpacity onPress={handleJoinRoom}></TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          backgroundColor: '#000',
+          padding: 10,
+          borderRadius: 5,
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onPress={handleJoinRoom}
+      ></TouchableOpacity>
     </View>
   );
 }

@@ -14,7 +14,7 @@
       "env": {
         "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_d2VhbHRoeS1waWdlb24tNTMuY2xlcmsuYWNjb3VudHMuZGV2JA",
         "EXPO_PUBLIC_GET_STREAM_API_KEY": "m8rg9bkje6xh",
-        "EXPO_PUBLIC_API_URL": "https://6b8d-103-12-122-62.ngrok-free.app "
+        "EXPO_PUBLIC_API_URL": "https://fd99-103-12-122-167.ngrok-free.app"
       },
       "ios": {
         "simulator": true

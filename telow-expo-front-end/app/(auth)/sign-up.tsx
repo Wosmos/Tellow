@@ -4,13 +4,13 @@ import {
   Text,
   TouchableOpacity,
   View,
-  StyleSheet,
+  SafeAreaView,
 } from 'react-native';
 import { useSignUp } from '@clerk/clerk-expo';
 import { useRouter, Link } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import styles from '../../constants/styles';
+import Dialog from 'react-native-dialog';
 import LinearGradientContainer from '@/components/LinearGradient';
+import styles from '@/constants/styles';
 import { Colors } from '@/constants/Colors';
 
 export default function SignUpScreen() {
@@ -21,11 +21,16 @@ export default function SignUpScreen() {
   const [password, setPassword] = React.useState('');
   const [pendingVerification, setPendingVerification] = React.useState(false);
   const [code, setCode] = React.useState('');
+  const [errorDialogVisible, setErrorDialogVisible] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
+
+  const handleError = (message: string) => {
+    setErrorMessage(message);
+    setErrorDialogVisible(true);
+  };
 
   const onSignUpPress = async () => {
-    if (!isLoaded) {
-      return;
-    }
+    if (!isLoaded) return;
 
     try {
       await signUp.create({
@@ -34,17 +39,17 @@ export default function SignUpScreen() {
       });
 
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
-
       setPendingVerification(true);
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      if (err.errors) {
+        const errorMessage = err.errors[0]?.message || 'An error occurred';
+        handleError(errorMessage);
+      }
     }
   };
 
   const onPressVerify = async () => {
-    if (!isLoaded) {
-      return;
-    }
+    if (!isLoaded) return;
 
     try {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
@@ -54,74 +59,81 @@ export default function SignUpScreen() {
       if (completeSignUp.status === 'complete') {
         await setActive({ session: completeSignUp.createdSessionId });
         router.replace('/');
-      } else {
-        console.error(JSON.stringify(completeSignUp, null, 2));
       }
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      handleError(err.errors[0]?.message || 'Verification failed');
     }
   };
+
   return (
-    <LinearGradientContainer
-      colors={Colors.bgGradient}
-      direction='bottomLeftToTopRight'
-    >
-      <SafeAreaView
-        style={[
-          styles.container,
-          {
-            flex: 1,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'transparent',
-          },
-        ]}
+    <SafeAreaView style={{ flex: 1 }}>
+      <LinearGradientContainer
+        colors={Colors.bgGradient}
+        direction='bottomLeftToTopRight'
       >
-        <Text style={styles.title}>Sign Up</Text>
-        <View style={styles.inputContainer}>
-          {!pendingVerification ? (
-            <>
-              <TextInput
-                style={styles.input}
-                autoCapitalize='none'
-                value={emailAddress}
-                placeholder='Email'
-                onChangeText={setEmailAddress}
-                keyboardType='email-address'
-              />
-              <TextInput
-                style={styles.input}
-                value={password}
-                placeholder='Password'
-                secureTextEntry={true}
-                onChangeText={setPassword}
-              />
-              <TouchableOpacity style={styles.button} onPress={onSignUpPress}>
-                <Text style={styles.buttonText}>Sign Up</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <TextInput
-                style={styles.input}
-                value={code}
-                placeholder='Verification Code'
-                onChangeText={setCode}
-                keyboardType='number-pad'
-              />
-              <TouchableOpacity style={styles.button} onPress={onPressVerify}>
-                <Text style={styles.buttonText}>Verify Email</Text>
-              </TouchableOpacity>
-            </>
-          )}
+        <View style={styles.container}>
+          <Text style={styles.title}>
+            {!pendingVerification ? 'Sign Up' : 'Verify Email'}
+          </Text>
+
+          <View style={styles.form}>
+            {!pendingVerification ? (
+              <View style={styles.inputContainer}>
+                <TextInput
+                  autoCapitalize='none'
+                  value={emailAddress}
+                  placeholder='Email...'
+                  onChangeText={setEmailAddress}
+                  style={styles.input}
+                />
+
+                <TextInput
+                  value={password}
+                  placeholder='Password...'
+                  secureTextEntry={true}
+                  onChangeText={setPassword}
+                  style={styles.input}
+                />
+
+                <TouchableOpacity onPress={onSignUpPress} style={styles.button}>
+                  <Text style={styles.buttonText}>Sign Up</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.inputContainer}>
+                <TextInput
+                  value={code}
+                  placeholder='Verification code...'
+                  onChangeText={setCode}
+                  style={styles.input}
+                />
+
+                <TouchableOpacity onPress={onPressVerify} style={styles.button}>
+                  <Text style={styles.buttonText}>Verify Email</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <View style={styles.signInContainer}>
+              <Text style={styles.signInText}>Already have an account?</Text>
+              <Link href='/(auth)/sign-in' asChild>
+                <TouchableOpacity style={styles.signInLink}>
+                  <Text style={styles.signInLinkText}>Sign in</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          </View>
         </View>
-        <View style={styles.signInContainer}>
-          <Text style={styles.signInText}>Already have an account?</Text>
-          <Link href='/(auth)/sign-in' style={styles.signInLink}>
-            <Text style={styles.signInLinkText}>Sign in</Text>
-          </Link>
-        </View>
-      </SafeAreaView>
-    </LinearGradientContainer>
+      </LinearGradientContainer>
+
+      <Dialog.Container visible={errorDialogVisible}>
+        <Dialog.Title>Error</Dialog.Title>
+        <Dialog.Description>{errorMessage}</Dialog.Description>
+        <Dialog.Button
+          label='OK'
+          onPress={() => setErrorDialogVisible(false)}
+        />
+      </Dialog.Container>
+    </SafeAreaView>
   );
 }

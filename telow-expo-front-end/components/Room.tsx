@@ -7,9 +7,9 @@ import { copySlug, formatSlug } from '@/app/lib/slugs';
 export default function room({ slug }: { slug: string }) {
   const router = useRouter();
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <View>
-        <RoomId slug={slug}  />
+        <RoomId slug={slug} />
       </View>
       <GestureHandlerRootView
         style={{

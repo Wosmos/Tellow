@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const Authstyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '100%',
@@ -8,7 +8,7 @@ const Authstyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'transparent',
     padding: 20,
-    gap: 10
+    gap: 10,
   },
   title: {
     fontSize: 40,
@@ -31,7 +31,6 @@ const Authstyles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 10,
     paddingHorizontal: 10,
-    
   },
   input: {
     backgroundColor: '#FFFFFF',
@@ -85,4 +84,48 @@ const Authstyles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-export default Authstyles;
+export default styles;
+
+
+
+import { theme } from './theme';
+
+export const commonStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  glass: {
+    backgroundColor: theme.blur.ios.backgroundColor,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: 16,
+  },
+  input: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 16,
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+});

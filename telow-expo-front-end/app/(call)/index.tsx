@@ -1,5 +1,5 @@
 import { SignedIn, SignedOut, useAuth, useUser } from '@clerk/clerk-expo';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import {
   StyleSheet,
   Text,
@@ -12,17 +12,18 @@ import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LinearGradientContainer from '@/components/LinearGradient';
 import { Colors } from '@/constants/Colors';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Entypo, Feather, Ionicons } from '@expo/vector-icons';
 import Dialog from 'react-native-dialog';
 import { Call, useStreamVideoClient } from '@stream-io/video-react-native-sdk';
 import { useRoute } from '@react-navigation/native';
-
 import useEffect from 'react';
+import { formatSlug } from '../lib/slugs';
 export default function Page() {
+
   const client = useStreamVideoClient();
   const { user } = useUser();
   const { signOut } = useAuth();
-  const router = useRoute();
+  const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isMyCalls, setIsMyCalls] = useState(false);
   const [calls, setCalls] = useState<Call[]>([]);
@@ -125,16 +126,84 @@ export default function Page() {
               ) : (
                 <Feather name='phone-call' size={24} color='gray' />
               )}
-              <Image source={{ uri: item.state.createdBy?.image }} style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                resizeMode: 'cover',
-                marginRight: 10,
-                borderWidth: 1,
-                borderColor: '#f1f1f1',
-              }} />
-              <Text>{item.id}</Text>
+              <Image
+                source={{ uri: item.state.createdBy?.image }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  resizeMode: 'cover',
+                  marginRight: 10,
+                  borderWidth: 1,
+                  borderColor: '#f1f1f1',
+                }}
+              />
+
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  // alignItems: 'center',
+                  // borderBottomWidth: 1,
+                  // borderBottomColor: '#f1f1f1',
+                  // paddingBottom: 10,
+                }}
+              >
+                <View style={{}}>
+                  <Text>
+                    {item.state.createdBy?.name ||
+                      item.state.createdBy?.custom.email.split('@')[0]}
+                  </Text>
+                  <Text style={{ fontSize: 12 }}>
+                    {item.state.createdBy?.custom.email}
+                  </Text>
+                </View>
+              </View>
+              <View>
+                <Text style={{ fontSize: 10, textAlign: 'right', width: 100 }}>
+                  {formatSlug(item.id)}
+                </Text>
+              </View>
+
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                {item.state.participantCount === 0 ? (
+                  <Text
+                    style={{ fontSize: 10, fontWeight: 'bold', color: 'blue' }}
+                  >
+                    Call Ended
+                  </Text>
+                ) : (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      borderRadius: 5,
+                      backgroundColor: 'green',
+                      alignItems: 'center',
+                      borderWidth: 1,
+                      borderColor: '#f1f1f1',
+                    }}
+                  >
+                    <Entypo
+                      name='users'
+                      size={14}
+                      color='blue'
+                      style={{ marginRight: 5 }}
+                    />
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 'bold',
+                        color: 'white',
+                        padding: 5,
+                      }}
+                    >
+                      {item.state.participantCount}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              {/* <Text>{item.id}</Text> */}
             </TouchableOpacity>
           )}
         />
