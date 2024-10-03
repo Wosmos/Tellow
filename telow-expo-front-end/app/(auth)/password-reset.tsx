@@ -92,13 +92,11 @@
 //   );
 // }
 
-
-
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSignIn } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
-import { BlurView } from 'expo-blur';
+// import { View } from 'expo-blur';
 import { commonStyles } from '@/constants/styles';
 import { theme } from '@/constants/theme';
 import PasswordInput from '@/components/InputPassword';
@@ -124,7 +122,7 @@ export default function ResetPasswordScreen() {
 
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
-        router.push('/success');
+        router.push('/(auth)/success');
       }
     } catch (err: any) {
       setError(err.errors?.[0]?.message || 'Failed to reset password');
@@ -133,7 +131,7 @@ export default function ResetPasswordScreen() {
 
   return (
     <View style={commonStyles.container}>
-      <BlurView intensity={80} style={commonStyles.glass}>
+      <View style={commonStyles.glass}>
         <Text style={commonStyles.title}>Reset Password</Text>
 
         <PasswordInput
@@ -156,7 +154,7 @@ export default function ResetPasswordScreen() {
         >
           <Text style={commonStyles.buttonText}>Reset Password</Text>
         </TouchableOpacity>
-      </BlurView>
+      </View>
     </View>
   );
 }

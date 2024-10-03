@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
-import { BlurView } from 'expo-blur';
+// import { View } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
 import { commonStyles } from '@/constants/styles';
 import { theme } from '@/constants/theme';
@@ -15,9 +15,9 @@ export default function SuccessScreen() {
       toValue: 1,
       useNativeDriver: true,
     }).start();
-    
+
     const timer = setTimeout(() => {
-      router.replace('/sign-in');
+      router.replace('/(auth)/sign-in');
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -25,7 +25,7 @@ export default function SuccessScreen() {
 
   return (
     <View style={commonStyles.container}>
-      <BlurView intensity={80} style={commonStyles.glass}>
+      <View style={commonStyles.glass}>
         <Animated.View
           style={[styles.iconContainer, { transform: [{ scale: scaleValue }] }]}
         >
@@ -39,7 +39,7 @@ export default function SuccessScreen() {
         <Text style={styles.subtitle}>
           You can now sign in with your new password.
         </Text>
-      </BlurView>
+      </View>
     </View>
   );
 }

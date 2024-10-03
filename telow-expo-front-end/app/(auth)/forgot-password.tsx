@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useSignIn } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
-import { BlurView } from 'expo-blur';
+// import { View } from 'expo-blur';
 import { commonStyles } from '@/constants/styles';
 import { theme } from '@/constants/theme';
 
@@ -37,7 +37,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <View style={commonStyles.container}>
-      <BlurView intensity={80} style={commonStyles.glass}>
+      <View style={commonStyles.glass}>
         <Text style={commonStyles.title}>Forgot Password</Text>
         <Text style={styles.subtitle}>
           Enter your email address and we'll send you a code to reset your
@@ -65,7 +65,7 @@ export default function ForgotPasswordScreen() {
         >
           <Text style={styles.backButtonText}>Back to Sign In</Text>
         </TouchableOpacity>
-      </BlurView>
+      </View>
     </View>
   );
 }

@@ -93,7 +93,12 @@ import { theme } from './theme';
 export const commonStyles = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
     padding: 20,
+    gap: 10,
   },
   glass: {
     backgroundColor: theme.blur.ios.backgroundColor,
@@ -105,27 +110,28 @@ export const commonStyles = StyleSheet.create({
     shadowRadius: 8,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: theme.colors.text,
-    marginBottom: 16,
+    fontSize: 40,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#f8faff',
   },
   input: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 10,
     fontSize: 16,
   },
   button: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#007AFF',
+    borderRadius: 10,
+    padding: 15,
+    width: '100%',
     alignItems: 'center',
   },
   buttonText: {
     color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: 'bold',
   },
 });

@@ -463,9 +463,6 @@
 //   );
 // }
 
-
-
-
 import React from 'react';
 import {
   View,
@@ -476,11 +473,14 @@ import {
 } from 'react-native';
 import { useSignIn } from '@clerk/clerk-expo';
 import { Link, useRouter } from 'expo-router';
-import { BlurView } from 'expo-blur';
-import  {commonStyles}  from '@/constants/styles';
+// import { View } from 'expo-blur';
+import { commonStyles } from '@/constants/styles';
 import { theme } from '@/constants/theme';
 import PasswordInput from '@/components/InputPassword';
 import SocialAuthButtons from '@/components/SignInWithOAuth';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradientContainer from '@/components/LinearGradient';
+import { Colors, colors } from '@/constants/Colors';
 
 export default function SignInScreen() {
   const { signIn, isLoaded } = useSignIn();
@@ -499,7 +499,7 @@ export default function SignInScreen() {
       });
 
       if (result.status === 'complete') {
-        router.replace('/');
+        router.replace('/(call)/');
       }
     } catch (err: any) {
       setError(err.errors?.[0]?.message || 'Sign in failed');
@@ -507,46 +507,49 @@ export default function SignInScreen() {
   };
 
   return (
-    <View style={commonStyles.container}>
-      <BlurView intensity={80} style={commonStyles.glass}>
-        <Text style={commonStyles.title}>Welcome Back</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <LinearGradientContainer  colors={Colors.bgGradient}      
+      >
+        <View style={commonStyles.container}>
+          <Text style={commonStyles.title}>Welcome Back</Text>
 
-        <TextInput
-          style={commonStyles.input}
-          placeholder='Email'
-          value={email}
-          onChangeText={setEmail}
-          keyboardType='email-address'
-          autoCapitalize='none'
-        />
+          <TextInput
+            style={commonStyles.input}
+            placeholder='Email'
+            value={email}
+            onChangeText={setEmail}
+            keyboardType='email-address'
+            autoCapitalize='none'
+          />
 
-        <PasswordInput value={password} onChangeText={setPassword} />
+          <PasswordInput value={password} onChangeText={setPassword} />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <TouchableOpacity style={commonStyles.button} onPress={handleSignIn}>
-          <Text style={commonStyles.buttonText}>Sign In</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={commonStyles.button} onPress={handleSignIn}>
+            <Text style={commonStyles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => router.push('/forgot-password')}
-          style={styles.forgotPassword}
-        >
-          <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push('/(auth)/forgot-password')}
+            style={styles.forgotPassword}
+          >
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
 
-        <SocialAuthButtons />
+          <SocialAuthButtons />
 
-        <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>Don't have an account? </Text>
-          <Link href='/sign-up' asChild>
-            <TouchableOpacity>
-              <Text style={styles.signUpLink}>Sign Up</Text>
-            </TouchableOpacity>
-          </Link>
+          <View style={styles.signUpContainer}>
+            <Text style={styles.signUpText}>Don't have an account? </Text>
+            <Link href='/sign-up' asChild>
+              <TouchableOpacity>
+                <Text style={styles.signUpLink}>Sign Up</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
-      </BlurView>
-    </View>
+      </LinearGradientContainer>
+    </SafeAreaView>
   );
 }
 

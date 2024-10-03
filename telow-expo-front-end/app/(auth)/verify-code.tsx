@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useSignIn } from '@clerk/clerk-expo';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { BlurView } from 'expo-blur';
+// import { View } from 'expo-blur';
 import { commonStyles } from '@/constants/styles';
 import { theme } from '@/constants/theme';
 
@@ -29,7 +29,7 @@ export default function VerifyCodeScreen() {
       });
 
       if (result.status === 'needs_new_password') {
-        router.push('/reset-password');
+        router.push('/(auth)/password-reset');
       }
     } catch (err: any) {
       setError(err.errors?.[0]?.message || 'Invalid code');
@@ -38,7 +38,7 @@ export default function VerifyCodeScreen() {
 
   return (
     <View style={commonStyles.container}>
-      <BlurView intensity={80} style={commonStyles.glass}>
+      <View  style={commonStyles.glass}>
         <Text style={commonStyles.title}>Enter Code</Text>
         <Text style={styles.subtitle}>
           We've sent a code to {email}. Enter it below to reset your password.
@@ -67,7 +67,7 @@ export default function VerifyCodeScreen() {
         >
           <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
-      </BlurView>
+      </View>
     </View>
   );
 }
