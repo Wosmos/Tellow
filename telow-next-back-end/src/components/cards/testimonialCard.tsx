@@ -12,7 +12,7 @@ const TestimonialCard: React.FC<{
         <CardDescription>{role}</CardDescription>
       </CardHeader>
       <CardContent>
-        <p className='italic'>"{content}"</p>
+        <p className='italic'>&ldquo;{content}&ldquo;</p>
       </CardContent>
     </Card>
   </div>

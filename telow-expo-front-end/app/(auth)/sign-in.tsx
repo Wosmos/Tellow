@@ -1,119 +1,119 @@
-// // // import { useSignIn } from '@clerk/clerk-expo';
-// // // import { Link, useRouter } from 'expo-router';
-// // // import {
-// // //   Text,
-// // //   TextInput,
-// // //   TouchableOpacity,
-// // //   View,
-// // //   StyleSheet,
-// // //   SafeAreaView,
-// // //   Alert,
-// // //   ViewBase,
-// // // } from 'react-native';
-// // // import React from 'react';
+import { useSignIn } from '@clerk/clerk-expo';
+import { Link, useRouter } from 'expo-router';
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  SafeAreaView,
+  Alert,
+  ViewBase,
+} from 'react-native';
+import React from 'react';
 
-// // // import styles from '../../constants/styles';
-// // // import SignInWithOAuth from '@/components/SignInWithOAuth';
-// // // import LinearGradientContainer from '@/components/LinearGradient';
-// // // import { Colors } from '@/constants/Colors';
+import styles from '../../constants/styles';
+import SignInWithOAuth from '@/components/SignInWithOAuth';
+import LinearGradientContainer from '@/components/LinearGradient';
+import { Colors } from '@/constants/Colors';
 
-// // // export default function Page() {
-// // //   const { signIn, setActive, isLoaded } = useSignIn();
-// // //   const router = useRouter();
+export default function Page() {
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const router = useRouter();
 
-// // //   const [emailAddress, setEmailAddress] = React.useState('');
-// // //   const [password, setPassword] = React.useState('');
+  const [emailAddress, setEmailAddress] = React.useState('');
+  const [password, setPassword] = React.useState('');
 
-// // //   const onSignInPress = React.useCallback(async () => {
-// // //     if (!isLoaded) {
-// // //       return;
-// // //     }
+  const onSignInPress = React.useCallback(async () => {
+    if (!isLoaded) {
+      return;
+    }
 
-// // //     try {
-// // //       const signInAttempt = await signIn.create({
-// // //         identifier: emailAddress,
-// // //         password,
-// // //       });
+    try {
+      const signInAttempt = await signIn.create({
+        identifier: emailAddress,
+        password,
+      });
 
-// // //       if (signInAttempt.status === 'complete') {
-// // //         await setActive({ session: signInAttempt.createdSessionId });
-// // //         router.replace('/');
-// // //       } else {
-// // //         console.error(JSON.stringify(signInAttempt, null, 2));
-// // //       }
-// // //     } catch (err: any) {
-// // //       console.error(JSON.stringify(err, null, 2));
-// // //       Alert.alert('opps something went wrong', err.message, [
-// // //         {
-// // //           text: 'Cancel',
-// // //           style: 'cancel',
-// // //           onPress: () => {
-// // //             router.replace('/(auth)/sign-in');
-// // //           },
-// // //         },
-// // //       ]);
-// // //     }
-// // //   }, [isLoaded, emailAddress, password]);
+      if (signInAttempt.status === 'complete') {
+        await setActive({ session: signInAttempt.createdSessionId });
+        router.replace('/');
+      } else {
+        console.error(JSON.stringify(signInAttempt, null, 2));
+      }
+    } catch (err: any) {
+      console.error(JSON.stringify(err, null, 2));
+      Alert.alert('opps something went wrong', err.message, [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+          onPress: () => {
+            router.replace('/(auth)/sign-in');
+          },
+        },
+      ]);
+    }
+  }, [isLoaded, emailAddress, password]);
 
-// // //   return (
-// // //     <LinearGradientContainer
-// // //       colors={Colors.bgGradient}
-// // //       direction='bottomLeftToTopRight'
-// // //     >
-// // //       <SafeAreaView style={styles.container}>
-// // //         <Text style={[styles.title, { fontSize: 100, fontFamily: 'poppins' }]}>
-// // //           Tele
-// // //         </Text>
-// // //         <Text style={styles.title}>Sign In</Text>
-// // //         <View style={styles.inputContainer}>
-// // //           <TextInput
-// // //             style={styles.input}
-// // //             autoCapitalize='none'
-// // //             value={emailAddress}
-// // //             placeholder='Email'
-// // //             onChangeText={setEmailAddress}
-// // //             keyboardType='email-address'
-// // //           />
-// // //           <TextInput
-// // //             style={styles.input}
-// // //             value={password}
-// // //             placeholder='Password'
-// // //             secureTextEntry={true}
-// // //             onChangeText={setPassword}
-// // //           />
-// // //           <View
-// // //             style={{
-// // //               borderBottomColor: '#ccc',
-// // //               borderBottomWidth: 1,
-// // //               marginVertical: 20,
-// // //             }}
-// // //           />
-// // //           <TouchableOpacity style={styles.button} onPress={onSignInPress}>
-// // //             <Text style={styles.buttonText}>Sign In</Text>
-// // //           </TouchableOpacity>
-// // //           <Text
-// // //             style={[
-// // //               styles.buttonText,
-// // //               { textAlign: 'center', marginVertical: 10 },
-// // //             ]}
-// // //           >
-// // //             OR
-// // //           </Text>
-// // //           {/* <TouchableOpacity style={styles.button} onPress={onSignInPress}>
-// // //           <Text style={styles.buttonText}>Sign In</Text>
-// // //         </TouchableOpacity> */}
-// // //           <SignInWithOAuth />
-// // //         </View>
-// // //         <View style={styles.signupContainer}>
-// // //           <Text style={styles.signupText}>Don't have an account?</Text>
-// // //           <Link href='/(auth)/sign-up' style={styles.signupLink}>
-// // //             <Text style={styles.signupLinkText}>Sign up</Text>
-// // //           </Link>
-// // //         </View>
-// // //       </SafeAreaView>
-// // //     </LinearGradientContainer>
-// // //   );
-// // // }
+  return (
+    <LinearGradientContainer
+      colors={Colors.bgGradient}
+      direction='bottomLeftToTopRight'
+    >
+      <SafeAreaView style={styles.container}>
+        <Text style={[styles.title, { fontSize: 100, fontFamily: 'poppins' }]}>
+          Tele
+        </Text>
+        <Text style={styles.title}>Sign In</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            autoCapitalize='none'
+            value={emailAddress}
+            placeholder='Email'
+            onChangeText={setEmailAddress}
+            keyboardType='email-address'
+          />
+          <TextInput
+            style={styles.input}
+            value={password}
+            placeholder='Password'
+            secureTextEntry={true}
+            onChangeText={setPassword}
+          />
+          <View
+            style={{
+              borderBottomColor: '#ccc',
+              borderBottomWidth: 1,
+              marginVertical: 20,
+            }}
+          />
+          <TouchableOpacity style={styles.button} onPress={onSignInPress}>
+            <Text style={styles.buttonText}>Sign In</Text>
+          </TouchableOpacity>
+          <Text
+            style={[
+              styles.buttonText,
+              { textAlign: 'center', marginVertical: 10 },
+            ]}
+          >
+            OR
+          </Text>
+          {/* <TouchableOpacity style={styles.button} onPress={onSignInPress}>
+          <Text style={styles.buttonText}>Sign In</Text>
+        </TouchableOpacity> */}
+          <SignInWithOAuth />
+        </View>
+        <View style={styles.signupContainer}>
+          <Text style={styles.signupText}>Don't have an account?</Text>
+          <Link href='/(auth)/sign-up' style={styles.signupLink}>
+            <Text style={styles.signupLinkText}>Sign up</Text>
+          </Link>
+        </View>
+      </SafeAreaView>
+    </LinearGradientContainer>
+  );
+}
 
 // // import { useSignIn } from '@clerk/clerk-expo';
 // // import { Link, useRouter } from 'expo-router';
@@ -463,119 +463,121 @@
 //   );
 // }
 
-import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
-import { useSignIn } from '@clerk/clerk-expo';
-import { Link, useRouter } from 'expo-router';
-// import { View } from 'expo-blur';
-import { commonStyles } from '@/constants/styles';
-import { theme } from '@/constants/theme';
-import PasswordInput from '@/components/InputPassword';
-import SocialAuthButtons from '@/components/SignInWithOAuth';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import LinearGradientContainer from '@/components/LinearGradient';
-import { Colors, colors } from '@/constants/Colors';
+// import React from 'react';
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   TouchableOpacity,
+//   StyleSheet,
+// } from 'react-native';
+// import { useSignIn } from '@clerk/clerk-expo';
+// import { Link, useRouter } from 'expo-router';
+// // import { View } from 'expo-blur';
+// import { commonStyles } from '@/constants/styles';
+// import { theme } from '@/constants/theme';
+// import PasswordInput from '@/components/InputPassword';
+// import SocialAuthButtons from '@/components/SignInWithOAuth';
+// import { SafeAreaView } from 'react-native-safe-area-context';
+// import LinearGradientContainer from '@/components/LinearGradient';
+// import { Colors, colors } from '@/constants/Colors';
 
-export default function SignInScreen() {
-  const { signIn, isLoaded } = useSignIn();
-  const router = useRouter();
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState('');
+// export default function SignInScreen() {
+//   const { signIn, isLoaded } = useSignIn();
+//   const router = useRouter();
+//   const [email, setEmail] = React.useState('');
+//   const [password, setPassword] = React.useState('');
+//   const [error, setError] = React.useState('');
 
-  const handleSignIn = async () => {
-    if (!isLoaded) return;
+//   const handleSignIn = async () => {
+//     if (!isLoaded) return;
 
-    try {
-      const result = await signIn.create({
-        identifier: email,
-        password,
-      });
+//     try {
+//       const result = await signIn.create({
+//         identifier: email,
+//         password,
+//       });
 
-      if (result.status === 'complete') {
-        router.replace('/(call)/');
-      }
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || 'Sign in failed');
-    }
-  };
+//       if (result.status === 'complete') {
+//         router.replace('/(call)/');
+//       }
+//     } catch (err: any) {
+//       setError(err.errors?.[0]?.message || 'Sign in failed');
+//     }
+//   };
 
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <LinearGradientContainer  colors={Colors.bgGradient}      
-      >
-        <View style={commonStyles.container}>
-          <Text style={commonStyles.title}>Welcome Back</Text>
+//   return (
+//     <SafeAreaView style={{ flex: 1 }}>
+//       <LinearGradientContainer
+//         colors={Colors.bgGradient}
+//         direction='bottomLeftToTopRight'
+//       >
+//         <View style={commonStyles.container}>
+//           <Text style={commonStyles.title}>Welcome Back</Text>
 
-          <TextInput
-            style={commonStyles.input}
-            placeholder='Email'
-            value={email}
-            onChangeText={setEmail}
-            keyboardType='email-address'
-            autoCapitalize='none'
-          />
+//           <TextInput
+//             style={commonStyles.input}
+//             placeholder='Email'
+//             value={email}
+//             onChangeText={setEmail}
+//             keyboardType='email-address'
+//             autoCapitalize='none'
+//           />
 
-          <PasswordInput value={password} onChangeText={setPassword} />
+//           <PasswordInput value={password} onChangeText={setPassword} />
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+//           {error ? <Text style={styles.error}>{error}</Text> : null}
 
-          <TouchableOpacity style={commonStyles.button} onPress={handleSignIn}>
-            <Text style={commonStyles.buttonText}>Sign In</Text>
-          </TouchableOpacity>
+//           <TouchableOpacity style={commonStyles.button} onPress={handleSignIn}>
+//             <Text style={commonStyles.buttonText}>Sign In</Text>
+//           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => router.push('/(auth)/forgot-password')}
-            style={styles.forgotPassword}
-          >
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-          </TouchableOpacity>
+//           <TouchableOpacity
+//             onPress={() => router.push('/(auth)/forgot-password')}
+//             style={styles.forgotPassword}
+//           >
+//             <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+//           </TouchableOpacity>
 
-          <SocialAuthButtons />
+//           <SocialAuthButtons />
 
-          <View style={styles.signUpContainer}>
-            <Text style={styles.signUpText}>Don't have an account? </Text>
-            <Link href='/sign-up' asChild>
-              <TouchableOpacity>
-                <Text style={styles.signUpLink}>Sign Up</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-        </View>
-      </LinearGradientContainer>
-    </SafeAreaView>
-  );
-}
+//           <View style={styles.signUpContainer}>
+//             <Text style={styles.signUpText}>Don't have an account? </Text>
+//             <Link href='/sign-up' asChild>
+//               <TouchableOpacity>
+//                 <Text style={styles.signUpLink}>Sign Up</Text>
+//               </TouchableOpacity>
+//             </Link>
+//           </View>
+//         </View>
+//       </LinearGradientContainer>
+//     </SafeAreaView>
+//   );
+// }
 
-const styles = StyleSheet.create({
-  error: {
-    color: theme.colors.error,
-    marginBottom: 16,
-  },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginTop: 8,
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    color: theme.colors.primary,
-  },
-  signUpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 24,
-  },
-  signUpText: {
-    color: theme.colors.text,
-  },
-  signUpLink: {
-    color: theme.colors.primary,
-    fontWeight: '600',
-  },
-});
+// const styles = StyleSheet.create({
+//   error: {
+//     color: theme.colors.error,
+//     marginBottom: 16,
+//   },
+//   forgotPassword: {
+//     alignSelf: 'flex-end',
+//     marginTop: 8,
+//     marginBottom: 24,
+//   },
+//   forgotPasswordText: {
+//     color: theme.colors.primary,
+//   },
+//   signUpContainer: {
+//     flexDirection: 'row',
+//     justifyContent: 'center',
+//     marginTop: 24,
+//   },
+//   signUpText: {
+//     color: theme.colors.text,
+//   },
+//   signUpLink: {
+//     color: theme.colors.primary,
+//     fontWeight: '600',
+//   },
+// });

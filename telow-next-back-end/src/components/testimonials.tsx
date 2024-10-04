@@ -12,7 +12,7 @@ const TestimonialCard: React.FC<{
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5 }}
   >
-    <p className='text-gray-600 italic mb-4'>"{text}"</p>
+    <p className='text-gray-600 italic mb-4'>&ldquo;{text}&ldquo;</p>
     <div className='font-semibold'>{name}</div>
     <div className='text-sm text-gray-500'>{role}</div>
   </motion.div>

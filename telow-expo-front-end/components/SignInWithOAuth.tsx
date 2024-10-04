@@ -34,7 +34,7 @@
 //         setActive!({ session: createdSessionId });
 //       } else {
 //         // Use signIn or signUp for next steps such as MFA
-        
+
 //       }
 //     } catch (err) {
 //       console.error('OAuth error', err);
@@ -50,8 +50,6 @@
 
 // export default SignInWithOAuth;
 
-
-
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useOAuth } from '@clerk/clerk-expo';
@@ -59,6 +57,7 @@ import { useCallback } from 'react';
 import { useWarmUpBrowser } from '@/hooks/useWarmUpBrowser';
 import * as WebBrowser from 'expo-web-browser';
 import style from '@/constants/styles';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -101,8 +100,8 @@ const SignInWithOAuth = () => {
       } catch (err) {
         console.error('OAuth error:', err);
       }
-
-    },    [googleAuth, facebookAuth, instagramAuth]
+    },
+    [googleAuth, facebookAuth, instagramAuth]
   );
 
   return (
@@ -118,21 +117,38 @@ const SignInWithOAuth = () => {
           onPress={() => onSelectAuth('google')}
           style={[style.button, styles.socialButton]}
         >
-          <Text style={style.buttonText}>Google</Text>
+          <Ionicons
+            name='logo-google'
+            size={30}
+            color='#FFFFFF'
+            style={styles.icon}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => onSelectAuth('facebook')}
           style={[style.button, styles.socialButton]}
         >
-          <Text style={style.buttonText}>Facebook</Text>
+          {/* <Text style={style.buttonText}>Facebook</Text> */}
+          <Ionicons
+            name='logo-facebook'
+            size={30}
+            color='#FFFFFF'
+            style={styles.icon}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => onSelectAuth('instagram')}
           style={[style.button, styles.socialButton]}
         >
-          <Text style={style.buttonText}>Instagram</Text>
+          {/* <Text style={style.buttonText}>Instagram</Text> */}
+          <Ionicons
+            name='logo-instagram'
+            size={30}
+            color='#FFFFFF'
+            style={styles.icon}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -162,11 +178,15 @@ const styles = StyleSheet.create({
   socialButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 20,
   },
   socialButton: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
   },
+  icon: {},
 });
 
 export default SignInWithOAuth;

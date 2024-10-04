@@ -117,6 +117,7 @@ export const commonStyles = StyleSheet.create({
   },
   input: {
     backgroundColor: '#FFFFFF',
+    width:  '100%',
     borderRadius: 15,
     padding: 15,
     marginBottom: 10,

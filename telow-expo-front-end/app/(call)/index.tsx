@@ -19,7 +19,6 @@ import { useRoute } from '@react-navigation/native';
 import useEffect from 'react';
 import { formatSlug } from '../lib/slugs';
 export default function Page() {
-
   const client = useStreamVideoClient();
   const { user } = useUser();
   const { signOut } = useAuth();
@@ -103,109 +102,113 @@ export default function Page() {
           keyExtractor={(item) => item.id}
           refreshing={isRefreshing}
           onRefresh={handleRefresh}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => handleJoinRoom(item.id)}
-              disabled={item.state.participantCount == 0}
-              style={{
-                padding: 20,
-                backgroundColor:
-                  item.state.participantCount === 0 ? '#f1f1f1' : '#fff',
-                opacity: item.state.participantCount === 0 ? 0.5 : 1,
-                borderBottomWidth: 1,
-                borderBottomColor:
-                  item.state.participantCount === 0 ? '#fff' : '#f1f1f1',
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 10,
-              }}
-            >
-              {item.state.participantCount === 0 ? (
-                <Feather name='phone-off' size={24} color='gray' />
-              ) : (
-                <Feather name='phone-call' size={24} color='gray' />
-              )}
-              <Image
-                source={{ uri: item.state.createdBy?.image }}
+          renderItem={({ item }) => {
+            const memberCount = item.state.participantCount;
+            return (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => handleJoinRoom(item.id)}
+                disabled={memberCount == 0}
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  resizeMode: 'cover',
-                  marginRight: 10,
-                  borderWidth: 1,
-                  borderColor: '#f1f1f1',
-                }}
-              />
-
-              <View
-                style={{
-                  flex: 1,
+                  padding: 20,
+                  backgroundColor: memberCount === 0 ? '#f1f1f1' : '#fff',
+                  opacity: memberCount === 0 ? 0.5 : 1,
+                  borderBottomWidth: 1,
+                  borderBottomColor: memberCount === 0 ? '#fff' : '#f1f1f1',
                   flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  // alignItems: 'center',
-                  // borderBottomWidth: 1,
-                  // borderBottomColor: '#f1f1f1',
-                  // paddingBottom: 10,
+
+                  alignItems: 'center',
+                  gap: 10,
                 }}
               >
-                <View style={{}}>
-                  <Text>
-                    {item.state.createdBy?.name ||
-                      item.state.createdBy?.custom.email.split('@')[0]}
-                  </Text>
-                  <Text style={{ fontSize: 12 }}>
-                    {item.state.createdBy?.custom.email}
+                {memberCount === 0 ? (
+                  <Feather name='phone-off' size={24} color='gray' />
+                ) : (
+                  <Feather name='phone-call' size={24} color='gray' />
+                )}
+                <Image
+                  source={{ uri: item.state.createdBy?.image }}
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    resizeMode: 'cover',
+                    marginRight: 10,
+                    borderWidth: 1,
+                    borderColor: '#f1f1f1',
+                  }}
+                />
+
+                <View
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <View style={{}}>
+                    <Text>
+                      {item.state.createdBy?.name ||
+                        item.state.createdBy?.custom.email.split('@')[0]}
+                    </Text>
+                    <Text style={{ fontSize: 12 }}>
+                      {item.state.createdBy?.custom.email}
+                    </Text>
+                  </View>
+                </View>
+                <View>
+                  <Text
+                    style={{ fontSize: 10, textAlign: 'right', width: 100 }}
+                  >
+                    {formatSlug(item.id)}
                   </Text>
                 </View>
-              </View>
-              <View>
-                <Text style={{ fontSize: 10, textAlign: 'right', width: 100 }}>
-                  {formatSlug(item.id)}
-                </Text>
-              </View>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                {item.state.participantCount === 0 ? (
-                  <Text
-                    style={{ fontSize: 10, fontWeight: 'bold', color: 'blue' }}
-                  >
-                    Call Ended
-                  </Text>
-                ) : (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      borderRadius: 5,
-                      backgroundColor: 'green',
-                      alignItems: 'center',
-                      borderWidth: 1,
-                      borderColor: '#f1f1f1',
-                    }}
-                  >
-                    <Entypo
-                      name='users'
-                      size={14}
-                      color='blue'
-                      style={{ marginRight: 5 }}
-                    />
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {memberCount === 0 ? (
                     <Text
                       style={{
                         fontSize: 10,
                         fontWeight: 'bold',
-                        color: 'white',
-                        padding: 5,
+                        color: 'blue',
                       }}
                     >
-                      {item.state.participantCount}
+                      Call Ended
                     </Text>
-                  </View>
-                )}
-              </View>
-              {/* <Text>{item.id}</Text> */}
-            </TouchableOpacity>
-          )}
+                  ) : (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        borderRadius: 5,
+                        backgroundColor: 'green',
+                        alignItems: 'center',
+                        borderWidth: 1,
+                        borderColor: '#f1f1f1',
+                      }}
+                    >
+                      <Entypo
+                        name='users'
+                        size={14}
+                        color='blue'
+                        style={{ marginRight: 5 }}
+                      />
+                      <Text
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 'bold',
+                          color: 'white',
+                          padding: 5,
+                        }}
+                      >
+                        {memberCount}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                {/* <Text>{item.id}</Text> */}
+              </TouchableOpacity>
+            );
+          }}
         />
       </SafeAreaView>
     </LinearGradientContainer>

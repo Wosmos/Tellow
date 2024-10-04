@@ -19,11 +19,11 @@ const About = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          Tellow is more than just a video calling app. It's a revolution in
-          digital communication, seamlessly blending cutting-edge technology
-          with intuitive design to create an unparalleled connection experience.
-          Our mission is to break down barriers and bring people together, no
-          matter the distance.
+          Tellow is more than just a video
+          calling app. It&#39;s a revolution in digital communication,
+          seamlessly blending cutting-edge technology with intuitive design to
+          create an unparalleled connection experience. Our mission is to break
+          down barriers and bring people together, no matter the distance.
         </motion.p>
       </div>
     </section>
