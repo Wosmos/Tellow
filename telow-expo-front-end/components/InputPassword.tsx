@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   eyeButton: {
     position: 'absolute',
     right: 16,
-    top: '50%',
+    top: '45%',
     transform: [{ translateY: -12 }],
   },
 });

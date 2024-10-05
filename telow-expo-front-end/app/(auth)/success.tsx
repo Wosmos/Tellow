@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
-// import { View } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
-import { commonStyles } from '@/constants/styles';
-import { theme } from '@/constants/theme';
+import { styles } from '@/constants/styles';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Colors } from '@/constants/Colors';
+import LinearGradientContainer from '@/components/LinearGradient';
 
 export default function SuccessScreen() {
   const router = useRouter();
@@ -18,47 +19,45 @@ export default function SuccessScreen() {
 
     const timer = setTimeout(() => {
       router.replace('/(auth)/sign-in');
-    }, 3000);
+    }, 60000);
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <View style={commonStyles.container}>
-      <View style={commonStyles.glass}>
+    <LinearGradientContainer
+      colors={Colors.bgGradient}
+      direction='bottomLeftToTopRight'
+    >
+      <SafeAreaView style={styles.container}>
         <Animated.View
-          style={[styles.iconContainer, { transform: [{ scale: scaleValue }] }]}
+          style={[
+            {
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 50,
+              width: 100,
+              height: 100,
+              marginBottom: 20,
+              shadowColor: '#000',
+              shadowOffset: {
+                width: 0,
+                height: 2,
+              },
+              shadowOpacity: 0.25,
+              shadowRadius: 3.84,
+              elevation: 5,
+            },
+            { transform: [{ scale: scaleValue }] },
+          ]}
         >
-          <Ionicons
-            name='checkmark-circle'
-            size={80}
-            color={theme.colors.success}
-          />
+          <Ionicons name='checkmark-circle' size={80} color={Colors.success} />
         </Animated.View>
         <Text style={styles.title}>Password Reset Successfully!</Text>
         <Text style={styles.subtitle}>
           You can now sign in with your new password.
         </Text>
-      </View>
-    </View>
+      </SafeAreaView>
+    </LinearGradientContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  iconContainer: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: theme.colors.text,
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: theme.colors.text,
-    textAlign: 'center',
-  },
-});

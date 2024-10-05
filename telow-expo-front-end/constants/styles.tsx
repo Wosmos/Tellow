@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '100%',
@@ -19,7 +19,8 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
     marginBottom: 20,
-    color: '#333333',
+    textAlign: 'center',
+    color: '#ffffff',
   },
 
   form: {
@@ -38,6 +39,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     fontSize: 16,
+    width: '100%',
   },
   button: {
     backgroundColor: '#007AFF',
@@ -53,14 +55,18 @@ const styles = StyleSheet.create({
   },
   signupContainer: {
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 0,
   },
   signupText: {
     fontSize: 16,
-    color: '#5e9dea',
+    color: '#ffffff',
+    fontWeight: 'normal',
   },
   signupLink: {
     marginLeft: 5,
+    fontSize:  16,
+    color: '#b6d9fe',
+    fontWeight: 'bold',
   },
   signupLinkText: {
     fontSize: 16,
@@ -70,6 +76,7 @@ const styles = StyleSheet.create({
   signInContainer: {
     flexDirection: 'row',
     marginTop: 20,
+    justifyContent: 'center',
   },
   signInText: {
     fontSize: 16,

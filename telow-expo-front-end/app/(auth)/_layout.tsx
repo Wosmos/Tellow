@@ -1,17 +1,44 @@
-import { StyleSheet, Text, View } from 'react-native';
+// app/(auth)/_layout.tsx
+import { StyleSheet } from 'react-native';
 import React from 'react';
 import { useAuth } from '@clerk/clerk-expo';
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, Stack, useNavigation } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AuthLoadingOverlay from '@/components/AuthLoadingOverlay';
 
-export default function AuthRootLayout() {
-  const { isSignedIn } = useAuth();
-  if (isSignedIn) <Redirect href={'/(call)'} />;
+export default function AuthLayout() {
+  const { isSignedIn, isLoaded } = useAuth();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const navigation = useNavigation();
+
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      if (isLoading) {
+        // Prevent navigation while loading
+        e.preventDefault();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, isLoading]);
+
+  // Not ready to show content yet
+  if (!isLoaded) return null;
+
+  // If signed in, redirect to the main app
+  if (isSignedIn) {
+    return <Redirect href='/(call)' />;
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      
-      <Stack>
+      <AuthLoadingOverlay visible={isLoading} />
+      <Stack
+        screenListeners={{
+          transitionStart: () => setIsLoading(true),
+          transitionEnd: () => setIsLoading(false),
+        }}
+      >
         <Stack.Screen
           name='sign-in'
           options={{
@@ -31,9 +58,8 @@ export default function AuthRootLayout() {
             statusBarHidden: true,
           }}
         />
+        {/* Other stack screens */}
       </Stack>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({});

@@ -24,7 +24,6 @@
     "@stream-io/react-native-webrtc": "^118.1.1",
     "@stream-io/video-react-native-sdk": "^1.0.13",
     "expo": "~51.0.28",
-    "expo-blur": "~13.0.2",
     "expo-clipboard": "~6.0.3",
     "expo-constants": "~16.0.2",
     "expo-dev-client": "~4.0.27",

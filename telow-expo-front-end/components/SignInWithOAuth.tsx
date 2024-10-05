@@ -108,7 +108,7 @@ const SignInWithOAuth = () => {
     <View style={styles.container}>
       <View style={styles.divider}>
         <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>Or continue with</Text>
+        <Text style={styles.dividerText}>continue with</Text>
         <View style={styles.dividerLine} />
       </View>
 
@@ -119,8 +119,8 @@ const SignInWithOAuth = () => {
         >
           <Ionicons
             name='logo-google'
-            size={30}
-            color='#FFFFFF'
+            // size={35}
+            // color='#FFFFFF'
             style={styles.icon}
           />
         </TouchableOpacity>
@@ -129,11 +129,10 @@ const SignInWithOAuth = () => {
           onPress={() => onSelectAuth('facebook')}
           style={[style.button, styles.socialButton]}
         >
-          {/* <Text style={style.buttonText}>Facebook</Text> */}
           <Ionicons
             name='logo-facebook'
-            size={30}
-            color='#FFFFFF'
+            // size={35}
+            // color='#FFFFFF'
             style={styles.icon}
           />
         </TouchableOpacity>
@@ -142,13 +141,7 @@ const SignInWithOAuth = () => {
           onPress={() => onSelectAuth('instagram')}
           style={[style.button, styles.socialButton]}
         >
-          {/* <Text style={style.buttonText}>Instagram</Text> */}
-          <Ionicons
-            name='logo-instagram'
-            size={30}
-            color='#FFFFFF'
-            style={styles.icon}
-          />
+          <Ionicons name='logo-instagram' style={styles.icon} />
         </TouchableOpacity>
       </View>
     </View>
@@ -157,7 +150,7 @@ const SignInWithOAuth = () => {
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 20,
+    // marginTop: 20,
     width: '100%',
   },
   divider: {
@@ -184,9 +177,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: 10,
   },
-  icon: {},
+  icon: {
+    fontSize: 40,
+    color: 'white',
+  },
 });
 
 export default SignInWithOAuth;

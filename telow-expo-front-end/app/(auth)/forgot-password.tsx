@@ -8,9 +8,10 @@ import {
 } from 'react-native';
 import { useSignIn } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
-// import { View } from 'expo-blur';
-import { commonStyles } from '@/constants/styles';
-import { theme } from '@/constants/theme';
+import { styles } from '@/constants/styles';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import LinearGradientContainer from '@/components/LinearGradient';
+import { Colors } from '@/constants/Colors';
 
 export default function ForgotPasswordScreen() {
   const { signIn, isLoaded } = useSignIn();
@@ -36,57 +37,35 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <View style={commonStyles.container}>
-      <View style={commonStyles.glass}>
-        <Text style={commonStyles.title}>Forgot Password</Text>
-        <Text style={styles.subtitle}>
-          Enter your email address and we'll send you a code to reset your
-          password.
-        </Text>
+    <LinearGradientContainer
+      colors={Colors.bgGradient}
+      direction='bottomLeftToTopRight'
+    >
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Forgot Password</Text>
 
         <TextInput
-          style={commonStyles.input}
-          placeholder='Email'
+          style={styles.input}
+          placeholder='Enter the email'
           value={email}
           onChangeText={setEmail}
           keyboardType='email-address'
           autoCapitalize='none'
         />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        {error ? <Text style={{}}>{error}</Text> : null}
 
-        <TouchableOpacity style={commonStyles.button} onPress={handleSendCode}>
-          <Text style={commonStyles.buttonText}>Send Code</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSendCode}>
+          <Text style={styles.buttonText}>Send Code</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backButton}
+          style={styles.signupContainer}
         >
-          <Text style={styles.backButtonText}>Back to Sign In</Text>
+          <Text style={styles.signInLinkText}>Back to Sign In</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+      </SafeAreaView>
+    </LinearGradientContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  subtitle: {
-    fontSize: 16,
-    color: theme.colors.text,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  error: {
-    color: theme.colors.error,
-    marginBottom: 16,
-  },
-  backButton: {
-    marginTop: 16,
-    alignSelf: 'center',
-  },
-  backButtonText: {
-    color: theme.colors.primary,
-    fontSize: 16,
-  },
-});

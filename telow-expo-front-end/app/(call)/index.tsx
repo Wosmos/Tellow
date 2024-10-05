@@ -71,19 +71,33 @@ export default function Page() {
       direction='bottomLeftToTopRight'
     >
       <SafeAreaView style={styles.container}>
-        <TouchableOpacity
-          onPress={() => setDialogOpen(true)}
+        <View
           style={{
-            position: 'absolute',
             flexDirection: 'row',
-            top: 20,
-            right: 20,
-            borderRadius: 50,
-            // backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'space-between',
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            width: '100%',
+            alignItems: 'center',
           }}
         >
-          <Ionicons name='log-out-outline' size={30} color='#fff' />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setDialogOpen(true)}
+            style={{
+              borderRadius: 50,
+            }}
+          >
+            <Ionicons name='log-out-outline' size={30} color='#fff' />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setDialogOpen(true)}
+            style={{
+              borderRadius: 50,
+            }}
+          >
+            <Ionicons name='log-out-outline' size={30} color='#fff' />
+          </TouchableOpacity>
+        </View>
 
         <Dialog.Container visible={dialogOpen}>
           <Dialog.Title>Log out</Dialog.Title>
@@ -103,25 +117,27 @@ export default function Page() {
           refreshing={isRefreshing}
           onRefresh={handleRefresh}
           renderItem={({ item }) => {
-            const memberCount = item.state.participantCount;
+            // const item.state.participantCount = item.state.participantCount;
             return (
               <TouchableOpacity
                 key={item.id}
                 onPress={() => handleJoinRoom(item.id)}
-                disabled={memberCount == 0}
+                disabled={item.state.participantCount == 0}
                 style={{
                   padding: 20,
-                  backgroundColor: memberCount === 0 ? '#f1f1f1' : '#fff',
-                  opacity: memberCount === 0 ? 0.5 : 1,
+                  backgroundColor:
+                    item.state.participantCount === 0 ? '#f1f1f1' : '#fff',
+                  opacity: item.state.participantCount === 0 ? 0.5 : 1,
                   borderBottomWidth: 1,
-                  borderBottomColor: memberCount === 0 ? '#fff' : '#f1f1f1',
+                  borderBottomColor:
+                    item.state.participantCount === 0 ? '#fff' : '#f1f1f1',
                   flexDirection: 'row',
 
                   alignItems: 'center',
                   gap: 10,
                 }}
               >
-                {memberCount === 0 ? (
+                {item.state.participantCount === 0 ? (
                   <Feather name='phone-off' size={24} color='gray' />
                 ) : (
                   <Feather name='phone-call' size={24} color='gray' />
@@ -138,7 +154,6 @@ export default function Page() {
                     borderColor: '#f1f1f1',
                   }}
                 />
-
                 <View
                   style={{
                     flex: 1,
@@ -165,7 +180,7 @@ export default function Page() {
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {memberCount === 0 ? (
+                  {item.state.participantCount === 0 ? (
                     <Text
                       style={{
                         fontSize: 10,
@@ -200,12 +215,11 @@ export default function Page() {
                           padding: 5,
                         }}
                       >
-                        {memberCount}
+                        {item.state.participantCount}
                       </Text>
                     </View>
                   )}
                 </View>
-                {/* <Text>{item.id}</Text> */}
               </TouchableOpacity>
             );
           }}

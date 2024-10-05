@@ -4,13 +4,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
 } from 'react-native';
 import { useSignIn } from '@clerk/clerk-expo';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-// import { View } from 'expo-blur';
-import { commonStyles } from '@/constants/styles';
-import { theme } from '@/constants/theme';
+import { styles } from '@/constants/styles';
+import LinearGradientContainer from '@/components/LinearGradient';
+import { Colors } from '@/constants/Colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function VerifyCodeScreen() {
   const { signIn, isLoaded } = useSignIn();
@@ -37,58 +37,43 @@ export default function VerifyCodeScreen() {
   };
 
   return (
-    <View style={commonStyles.container}>
-      <View  style={commonStyles.glass}>
-        <Text style={commonStyles.title}>Enter Code</Text>
+    <LinearGradientContainer
+      colors={Colors.bgGradient}
+      direction='bottomLeftToTopRight'
+    >
+      <SafeAreaView  style={styles.container}>
+        <Text style={styles.title}>Enter Code</Text>
         <Text style={styles.subtitle}>
           We've sent a code to {email}. Enter it below to reset your password.
         </Text>
 
         <TextInput
-          style={commonStyles.input}
+          style={styles.input}
           placeholder='Enter code'
           value={code}
           onChangeText={setCode}
           keyboardType='number-pad'
         />
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        {error ? <Text style={{
+          color: 'red', marginBottom: 16
+        }}>{error}</Text> : null}
 
         <TouchableOpacity
-          style={commonStyles.button}
+          style={styles.button}
           onPress={handleVerifyCode}
         >
-          <Text style={commonStyles.buttonText}>Verify Code</Text>
+          <Text style={styles.buttonText}>Verify Code</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => router.back()}
-          style={styles.backButton}
+          style={styles.signupContainer}
         >
-          <Text style={styles.backButtonText}>Back</Text>
+          <Text style={styles.signInLinkText}>Back</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+      </SafeAreaView>
+    
+    </LinearGradientContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  subtitle: {
-    fontSize: 16,
-    color: theme.colors.text,
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  error: {
-    color: theme.colors.error,
-    marginBottom: 16,
-  },
-  backButton: {
-    marginTop: 16,
-    alignSelf: 'center',
-  },
-  backButtonText: {
-    color: theme.colors.primary,
-    fontSize: 16,
-  },
-});

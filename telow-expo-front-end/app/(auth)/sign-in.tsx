@@ -16,10 +16,12 @@ import styles from '../../constants/styles';
 import SignInWithOAuth from '@/components/SignInWithOAuth';
 import LinearGradientContainer from '@/components/LinearGradient';
 import { Colors } from '@/constants/Colors';
+import PasswordInput from '@/components/InputPassword';
 
 export default function Page() {
   const { signIn, setActive, isLoaded } = useSignIn();
   const router = useRouter();
+  const [error, setError] = React.useState('');
 
   const [emailAddress, setEmailAddress] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -37,7 +39,7 @@ export default function Page() {
 
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.replace('/');
+        router.replace('/(call)/');
       } else {
         console.error(JSON.stringify(signInAttempt, null, 2));
       }
@@ -74,13 +76,23 @@ export default function Page() {
             onChangeText={setEmailAddress}
             keyboardType='email-address'
           />
-          <TextInput
-            style={styles.input}
-            value={password}
-            placeholder='Password'
-            secureTextEntry={true}
-            onChangeText={setPassword}
-          />
+
+          <PasswordInput value={password} onChangeText={setPassword} />
+
+          {error ? (
+            <Text style={{ color: 'red', marginBottom: 16 }}>{error}</Text>
+          ) : null}
+          <Link
+            href='/(auth)/forgot-password'
+            // onPress={() => router.push('/(auth)/forgot-password')}
+            style={{
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+              marginBottom: -10,
+            }}
+          >
+            <Text style={{ color: 'white' }}>Forgot Password?</Text>
+          </Link>
           <View
             style={{
               borderBottomColor: '#ccc',
@@ -88,6 +100,7 @@ export default function Page() {
               marginVertical: 20,
             }}
           />
+
           <TouchableOpacity style={styles.button} onPress={onSignInPress}>
             <Text style={styles.buttonText}>Sign In</Text>
           </TouchableOpacity>
@@ -99,9 +112,7 @@ export default function Page() {
           >
             OR
           </Text>
-          {/* <TouchableOpacity style={styles.button} onPress={onSignInPress}>
-          <Text style={styles.buttonText}>Sign In</Text>
-        </TouchableOpacity> */}
+
           <SignInWithOAuth />
         </View>
         <View style={styles.signupContainer}>

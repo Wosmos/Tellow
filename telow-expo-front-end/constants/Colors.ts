@@ -19,6 +19,10 @@ export const Colors = {
     tabIconSelected: tintColorDark,
   },
   bgGradient: ['#1982C4', '#8338EC', '#3BCEAC'],
+  error: 'red',
+  warning: 'yellow',
+  success: 'green',
+  gray: '#9BA1A6',
 };
 
 // colors.ts

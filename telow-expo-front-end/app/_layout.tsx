@@ -3,6 +3,7 @@ import { Slot } from 'expo-router';
 import React from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { RootSiblingParent } from 'react-native-root-siblings';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 const tokenCache = {
   async getToken(key: string) {
     try {
@@ -40,7 +41,9 @@ export default function RootLayout() {
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <ClerkLoaded>
         <RootSiblingParent>
-          <Slot />
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Slot />
+          </GestureHandlerRootView>
         </RootSiblingParent>
       </ClerkLoaded>
     </ClerkProvider>
