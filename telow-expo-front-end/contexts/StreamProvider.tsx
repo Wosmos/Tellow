@@ -35,6 +35,7 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       client.disconnectUser();
+      
       setStreamClient(null);
       setClientIsReady(false);
     };
