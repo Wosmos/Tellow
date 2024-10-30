@@ -30,7 +30,7 @@ export function StreamProvider({ children }: { children: React.ReactNode }) {
       token: user.streamToken, // You need to provide this from your backend
     });
 
-    setStreamClient(client);
+    setStreamClient(client); 
     setClientIsReady(true);
 
     return () => {
