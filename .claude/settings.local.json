@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.around.co)",
+      "WebFetch(domain:www.moburst.com)",
+      "WebFetch(domain:tuple.app)",
+      "WebFetch(domain:descript.com)",
+      "WebFetch(domain:riverside.fm)",
+      "WebFetch(domain:riverside.com)",
+      "Bash($LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe devices:*)",
+      "Bash($LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe shell:*)",
+      "Bash(npx expo:*)",
+      "Bash(java -version)",
+      "Read(//c/Program Files/Java/**)",
+      "Read(//c/Program Files/**)",
+      "Bash(npx --yes kill-port 8081)",
+      "Bash(lsof -ti:8081)",
+      "Bash(xargs kill:*)",
+      "Bash(npx --yes kill-port 8082)",
+      "Bash(curl -s http://localhost:8081/status)",
+      "Bash(curl -s http://localhost:8082/status)",
+      "Bash($LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe reverse:*)",
+      "Bash(winget search:*)",
+      "Bash(winget install:*)",
+      "Bash(export JAVA_HOME=\"C:/Program Files/Zulu/zulu-17\")",
+      "Bash(\"$JAVA_HOME/bin/java\" -version)",
+      "Bash(gh search:*)",
+      "WebFetch(domain:dev.to)",
+      "Bash(docker --version)",
+      "Bash(\"C:/Program Files/Docker/Docker/resources/bin/docker.exe\" --version)",
+      "Bash(docker.exe --version)",
+      "Bash(cmd.exe /c \"rmdir /s /q D:\\\\Tellow\\\\rocket-chat-app\\\\.git\")"
+    ],
+    "additionalDirectories": [
+      "d:\\Tellow\\rocket-chat-app\\.git"
+    ]
+  }
+}
