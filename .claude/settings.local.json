@@ -29,10 +29,16 @@
       "Bash(docker --version)",
       "Bash(\"C:/Program Files/Docker/Docker/resources/bin/docker.exe\" --version)",
       "Bash(docker.exe --version)",
-      "Bash(cmd.exe /c \"rmdir /s /q D:\\\\Tellow\\\\rocket-chat-app\\\\.git\")"
+      "Bash(cmd.exe /c \"rmdir /s /q D:\\\\Tellow\\\\rocket-chat-app\\\\.git\")",
+      "Bash(\"/c/Program Files/Docker/Docker/resources/bin/docker.exe\" --version)",
+      "Bash(cmd.exe /c \"rmdir /s /q D:\\\\Tellow\\\\rocket-chat-app\")",
+      "Bash(cmd.exe /c \"rmdir /s /q D:\\\\Tellow\\\\whatsapp-lite\\\\.git\")",
+      "Bash(npm install:*)",
+      "Bash(npx firebase:*)"
     ],
     "additionalDirectories": [
-      "d:\\Tellow\\rocket-chat-app\\.git"
+      "d:\\Tellow\\rocket-chat-app\\.git",
+      "d:\\Tellow\\rocket-chat-app"
     ]
   }
 }
