@@ -1,5 +1,3 @@
-npx expo logout
-
 import { Seen, Status } from "../utils/store/types";
 
 export type LoggedInStackParamList = {

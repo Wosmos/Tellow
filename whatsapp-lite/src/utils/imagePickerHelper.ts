@@ -1,8 +1,7 @@
 import * as ImagePicker from "expo-image-picker";
 import { Platform } from "react-native";
-import { getFirebaseApp } from "./firebase";
 import uuid from "react-native-uuid";
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
+import { supabase } from "./supabase";
 
 export const launchImagePicker = async () => {
 	await checkMediaPermissions();
@@ -20,7 +19,6 @@ export const launchImagePicker = async () => {
 };
 
 export const openCamera = async () => {
-	// check for camera permissions
 	const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
 
 	if (permissionResult.granted === false) {
@@ -41,8 +39,6 @@ export const openCamera = async () => {
 };
 
 export const uploadImageAsync = async (uri: string, isChatImage = false, isStatusImage = false) => {
-	const app = getFirebaseApp();
-
 	const blob: any = await new Promise((resolve, reject) => {
 		const xhr = new XMLHttpRequest();
 		xhr.onload = function () {
@@ -60,13 +56,25 @@ export const uploadImageAsync = async (uri: string, isChatImage = false, isStatu
 	});
 
 	const pathFolder = isChatImage ? "chatImages" : isStatusImage ? "statusImages" : "profileImages";
-	const storageRef = ref(getStorage(app), `${pathFolder}/${uuid.v4()}`);
+	const fileName = `${pathFolder}/${uuid.v4()}`;
 
-	await uploadBytesResumable(storageRef, blob);
+	// Convert blob to arraybuffer for Supabase
+	const arrayBuffer = await new Response(blob).arrayBuffer();
+
+	const { error } = await supabase.storage
+		.from("images")
+		.upload(fileName, arrayBuffer, {
+			contentType: "image/jpeg",
+			upsert: false,
+		});
 
 	blob.close();
 
-	return await getDownloadURL(storageRef);
+	if (error) throw error;
+
+	const { data } = supabase.storage.from("images").getPublicUrl(fileName);
+
+	return data.publicUrl;
 };
 
 const checkMediaPermissions = async () => {

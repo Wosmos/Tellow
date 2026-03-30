@@ -1,5 +1,4 @@
-import { child, get, getDatabase, push, ref, remove, set, update } from "firebase/database";
-import { getFirebaseApp } from "../firebase";
+import { supabase } from "../supabase";
 import { Message, UserData } from "../store/types";
 import { ChatData as ChatDataType } from "../store/types";
 import { getUserPushTokens } from "./authActions";
@@ -9,44 +8,35 @@ type ChatData = {
 	isGroupChat: boolean;
 	chatName?: string;
 	chatImage?: string;
-	// createdBy: string;
-	// updatedBy: string;
-	// createdAt: string;
-	// updatedAt: string;
-	// chatId: string;
 };
 
-// creating new chat
 export const createChat = async (loggedInUserId: string, chatData: ChatData) => {
-	const newChatData = {
-		...chatData,
-		createdBy: loggedInUserId,
-		updatedBy: loggedInUserId,
-		createdAt: new Date().toISOString(),
-		updatedAt: new Date().toISOString(),
-	};
-
 	try {
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
-		const newChat = await push(child(dbRef, "chats"), newChatData); // newChat.key is the chatId
+		const { data: newChat, error: chatError } = await supabase
+			.from("chats")
+			.insert({
+				is_group_chat: chatData.isGroupChat,
+				chat_name: chatData.chatName || "",
+				chat_image: chatData.chatImage || "",
+				created_by: loggedInUserId,
+				updated_by: loggedInUserId,
+			})
+			.select("chat_id")
+			.single();
 
-		const chatUsers = newChatData.users; // array of userIds(chat participants)
-		for (let i = 0; i < chatUsers.length; i++) {
-			const userId = chatUsers[i];
+		if (chatError) throw chatError;
 
-			// also record or store the chats(chatIds) that each user is a part of
-			// will be stored in the format of:
-			// userChats: {
-			//     userId1: {
-			//         someId1: chatId1,
-			//         someId2: chatId2,
-			//         ...
-			//     },
-			const newUserChat = await push(child(dbRef, `userChats/${userId}`), newChat.key);
-		}
+		const chatId = newChat.chat_id;
 
-		return newChat.key; // chatId
+		// Add all users to chat_users
+		const chatUsers = chatData.users.map((userId) => ({
+			chat_id: chatId,
+			user_id: userId,
+		}));
+
+		await supabase.from("chat_users").insert(chatUsers);
+
+		return chatId;
 	} catch (err) {
 		throw new Error("Something went wrong while creating a new chat. Please try again later.");
 	}
@@ -60,15 +50,25 @@ type UpdateChatParams = {
 
 export const updateChatData = async (data: UpdateChatParams) => {
 	const { chatId, userId, chatData } = data;
-	const app = getFirebaseApp();
-	const dbRef = ref(getDatabase(app));
-	const chatRef = child(dbRef, `chats/${chatId}`);
 
-	await update(chatRef, {
-		...chatData,
-		updatedAt: new Date().toISOString(),
-		updatedBy: userId,
-	});
+	const updateData: any = {
+		updated_at: new Date().toISOString(),
+		updated_by: userId,
+	};
+
+	if (chatData.chatName !== undefined) updateData.chat_name = chatData.chatName;
+	if (chatData.chatImage !== undefined) updateData.chat_image = chatData.chatImage;
+	if (chatData.users !== undefined) {
+		// Update chat_users table: remove all and re-insert
+		await supabase.from("chat_users").delete().eq("chat_id", chatId);
+		const chatUsers = chatData.users.map((uid) => ({
+			chat_id: chatId,
+			user_id: uid,
+		}));
+		await supabase.from("chat_users").insert(chatUsers);
+	}
+
+	await supabase.from("chats").update(updateData).eq("chat_id", chatId);
 };
 
 type SendMessageParams = {
@@ -76,57 +76,33 @@ type SendMessageParams = {
 	senderId: string;
 	messageText: string;
 	imageUrl?: string;
-	replyTo?: string; // other message Id
+	replyTo?: string;
 	type?: string;
 };
 
 const sendMessage = async (data: SendMessageParams) => {
 	const { chatId, senderId, messageText, imageUrl, replyTo, type } = data;
 
-	const app = getFirebaseApp();
-	const dbRef = ref(getDatabase());
-
-	// store messages for each chatId
-	// record or store messages in the format of:
-	// messages: {
-	//     chatId1: {
-	//         someMessageId1: {
-	//             sentBy: senderId,
-	//             sentAt: new Date().toISOString(),
-	//             text: messageText,
-	//             replyTo: replyTo,
-	//             imageUrl: imageUrl,
-	//         },
-	//     }
-	// }
-	const messagesRef = child(dbRef, `messages/${chatId}`);
-
-	const messageData: Omit<Message, "messageId"> = {
-		sentBy: senderId,
-		sentAt: new Date().toISOString(),
+	const messageData: any = {
+		chat_id: chatId,
+		sent_by: senderId,
 		text: messageText,
 	};
 
-	if (replyTo) {
-		messageData.replyTo = replyTo;
-	}
+	if (replyTo) messageData.reply_to = replyTo;
+	if (imageUrl) messageData.image_url = imageUrl;
+	if (type) messageData.type = type;
 
-	if (imageUrl) {
-		messageData.imageUrl = imageUrl;
-	}
+	await supabase.from("messages").insert(messageData);
 
-	if (type) {
-		messageData.type = type;
-	}
-
-	await push(messagesRef, messageData);
-
-	const chatRef = child(dbRef, `chats/${chatId}`);
-	await update(chatRef, {
-		updatedBy: senderId,
-		updatedAt: new Date().toISOString(),
-		latestMessageText: messageText,
-	});
+	await supabase
+		.from("chats")
+		.update({
+			updated_by: senderId,
+			updated_at: new Date().toISOString(),
+			latest_message_text: messageText,
+		})
+		.eq("chat_id", chatId);
 };
 
 type sendTextMessageParams = Omit<SendMessageParams, "imageUrl" | "senderId"> & {
@@ -140,7 +116,6 @@ export const sendTextMessage = async (data: sendTextMessageParams) => {
 		senderId: data.senderUserData.userId,
 	});
 
-	// send push notification to all users in chat except sender
 	const otherUsers = data.usersInChat.filter((uid) => uid !== data.senderUserData.userId);
 	await sendPushNotificationToUsers({
 		chatUsers: otherUsers,
@@ -162,7 +137,6 @@ export const sendImage = async (data: SendImageParams) => {
 		senderId: data.senderUserData.userId,
 	});
 
-	// send push notification to all users in chat except sender
 	const otherUsers = data.usersInChat.filter((uid) => uid !== data.senderUserData.userId);
 	await sendPushNotificationToUsers({
 		chatUsers: otherUsers,
@@ -181,52 +155,53 @@ export const sendInfoMessage = async (data: Omit<SendMessageParams, "type" | "im
 
 export const deleteMessage = async (data: { chatId: string; messageId: string; userId: string }) => {
 	const { chatId, messageId, userId } = data;
-	const app = getFirebaseApp();
-	const dbRef = ref(getDatabase());
 
-	const messageRef = child(dbRef, `messages/${chatId}/${messageId}`);
+	await supabase
+		.from("messages")
+		.update({
+			updated_at: new Date().toISOString(),
+			type: "deleted",
+			text: "Message deleted",
+		})
+		.eq("message_id", messageId);
 
-	await update(messageRef, {
-		updatedAt: new Date().toISOString(),
-		type: "deleted",
-		text: "Message deleted",
-	});
-
-	const chatRef = child(dbRef, `chats/${chatId}`);
-	await update(chatRef, {
-		updatedBy: userId,
-		updatedAt: new Date().toISOString(),
-	});
+	await supabase
+		.from("chats")
+		.update({
+			updated_by: userId,
+			updated_at: new Date().toISOString(),
+		})
+		.eq("chat_id", chatId);
 };
 
 export const editChatMessage = async (data: { chatId: string; messageId: string; text: string; userId: string }) => {
 	const { chatId, messageId, text, userId } = data;
-	const app = getFirebaseApp();
-	const dbRef = ref(getDatabase());
 
-	const messageRef = child(dbRef, `messages/${chatId}/${messageId}`);
+	await supabase
+		.from("messages")
+		.update({
+			updated_at: new Date().toISOString(),
+			type: "edited",
+			text,
+		})
+		.eq("message_id", messageId);
 
-	await update(messageRef, {
-		updatedAt: new Date().toISOString(),
-		type: "edited",
-		text,
-	});
-
-	const chatRef = child(dbRef, `chats/${chatId}`);
-	await update(chatRef, {
-		updatedBy: userId,
-		updatedAt: new Date().toISOString(),
-	});
+	await supabase
+		.from("chats")
+		.update({
+			updated_by: userId,
+			updated_at: new Date().toISOString(),
+		})
+		.eq("chat_id", chatId);
 };
 
 export const addUserChat = async (data: { userId: string; chatId: string }) => {
 	const { userId, chatId } = data;
 	try {
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
-		const chatRef = child(dbRef, `userChats/${userId}`);
-
-		await push(chatRef, chatId);
+		await supabase.from("chat_users").insert({
+			chat_id: chatId,
+			user_id: userId,
+		});
 	} catch (error) {
 		console.log(error);
 		throw error;
@@ -244,27 +219,19 @@ export const addUsersToChat = async (data: addUsersToChatParams) => {
 
 	const existingUsers = Object.values(chatData.users);
 	const newUsers: string[] = [];
-
 	let userAddedName = "";
 
 	usersToAddData.forEach(async (userToAdd) => {
 		const userIdToAdd = userToAdd.userId;
-
 		if (existingUsers.includes(userIdToAdd)) return;
 
 		newUsers.push(userIdToAdd);
-
-		// add chatId to list of userChats for each user
 		await addUserChat({ userId: userIdToAdd, chatId: chatData.key });
-
 		userAddedName = `${userToAdd.firstName} ${userToAdd.lastName}`;
 	});
 
-	if (newUsers.length === 0) {
-		return;
-	}
+	if (newUsers.length === 0) return;
 
-	// await updateChatData(chatData.key, userLoggedInData.userId, { users: existingUsers.concat(newUsers) });
 	await updateChatData({
 		chatId: chatData.key,
 		userId: userLoggedInData.userId,
@@ -273,7 +240,6 @@ export const addUsersToChat = async (data: addUsersToChatParams) => {
 		},
 	});
 
-	// send info message to chat
 	const moreUsersMessage = newUsers.length > 1 ? `and ${newUsers.length - 1} others ` : "";
 	const messageText = `${userLoggedInData.firstName} ${userLoggedInData.lastName} added ${userAddedName} ${moreUsersMessage}to the chat`;
 	await sendInfoMessage({
@@ -285,12 +251,18 @@ export const addUsersToChat = async (data: addUsersToChatParams) => {
 
 export const getUserChats = async (userId: string) => {
 	try {
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
-		const userRef = child(dbRef, `userChats/${userId}`);
+		const { data, error } = await supabase
+			.from("chat_users")
+			.select("chat_id")
+			.eq("user_id", userId);
 
-		const snapshot = await get(userRef);
-		return snapshot.val();
+		if (error) throw error;
+
+		const result: Record<string, string> = {};
+		data?.forEach((row, i) => {
+			result[i.toString()] = row.chat_id;
+		});
+		return result;
 	} catch (error) {
 		console.log(error);
 	}
@@ -299,11 +271,11 @@ export const getUserChats = async (userId: string) => {
 export const deleteUserChat = async (data: { userId: string; key: string }) => {
 	const { userId, key } = data;
 	try {
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
-		const chatRef = child(dbRef, `userChats/${userId}/${key}`);
-
-		await remove(chatRef);
+		await supabase
+			.from("chat_users")
+			.delete()
+			.eq("user_id", userId)
+			.eq("chat_id", key);
 	} catch (error) {
 		console.log(error);
 		throw error;
@@ -322,29 +294,17 @@ export const removeUserFromChat = async (data: RemoveUserFromChatParams) => {
 	const userToRemoveId = userToRemoveData.userId;
 	const newUsers = chatData.users.filter((uid) => uid !== userToRemoveId);
 
-	// remove user from the user list of chat
 	await updateChatData({
 		chatId: chatData.key,
 		userId: userLoggedInData.userId,
-		chatData: {
-			users: newUsers,
-		},
+		chatData: { users: newUsers },
 	});
 
-	// remove chatId from the list of chats that user is a part of
-	const userChats = await getUserChats(userToRemoveId);
-
-	for (const key in userChats) {
-		const currentChatId = userChats[key];
-
-		if (currentChatId === chatData.key) {
-			await deleteUserChat({
-				userId: userToRemoveId,
-				key,
-			});
-			break;
-		}
-	}
+	await supabase
+		.from("chat_users")
+		.delete()
+		.eq("user_id", userToRemoveId)
+		.eq("chat_id", chatData.key);
 
 	const messageText =
 		userLoggedInData.userId === userToRemoveData.userId
@@ -366,18 +326,12 @@ type MarkMessageAsSeenParams = {
 
 export const markMessageAsSeen = async (data: MarkMessageAsSeenParams) => {
 	try {
-		const { chatId, messageId, seenBy } = data;
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase());
+		const { messageId, seenBy } = data;
 
-		const messageSeenRef = child(dbRef, `messages/${chatId}/${messageId}/seen`);
-
-		const seenData = {
-			seenBy,
-			seenAt: new Date().toISOString(),
-		};
-
-		await push(messageSeenRef, seenData);
+		await supabase.from("message_seen").insert({
+			message_id: messageId,
+			seen_by: seenBy,
+		});
 	} catch (err) {
 		console.log(err);
 	}
@@ -393,7 +347,6 @@ type SendPushNotificationToUsersParams = {
 const sendPushNotificationToUsers = (data: SendPushNotificationToUsersParams) => {
 	const { chatUsers, title, body, chatId } = data;
 	chatUsers.forEach(async (uid) => {
-		console.log("test");
 		const tokens = await getUserPushTokens(uid);
 
 		for (const key in tokens) {
@@ -401,9 +354,7 @@ const sendPushNotificationToUsers = (data: SendPushNotificationToUsersParams) =>
 
 			await fetch("https://exp.host/--/api/v2/push/send", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					to: token,
 					title,

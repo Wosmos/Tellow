@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as Notifications from "expo-notifications";
-import { StackActions, useNavigation } from "@react-navigation/native";
-import { child, get, getDatabase, off, onValue, ref } from "firebase/database";
+import { useNavigation } from "@react-navigation/native";
 import { StackNavigator } from "./LoggedInScreens";
 import { useAppDispatch, useAppSelector } from "../utils/store";
-import { getFirebaseApp } from "../utils/firebase";
+import { supabase } from "../utils/supabase";
 import { ChatData, Status, UserData } from "../utils/store/types";
 import { setStoredUsers } from "../utils/store/usersSlice";
 import { setChatsData } from "../utils/store/chatsSlice";
@@ -15,13 +14,11 @@ import { registerForPushNotificationsAsync } from "../utils/notifications";
 import { setContactStatuses, setMyStatuses } from "../utils/store/statusSlice";
 import { StackScreenProps } from "@react-navigation/stack";
 import { LoggedInStackParamList } from "./types";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 type NavigationProps = StackScreenProps<LoggedInStackParamList, "Chat">["navigation"];
 
 const LoggedInNavigator = () => {
-	// const [expoPushToken, setExpoPushToken] = useState("");
-	// console.log("expoPushToken", expoPushToken);
-	// console.log(expoPushToken);
 	const [isLoading, setIsLoading] = useState(true);
 	const userData = useAppSelector((state) => state.auth.userData)!;
 	const storedUsers = useAppSelector((state) => state.storedUsers.storedUsers);
@@ -34,27 +31,15 @@ const LoggedInNavigator = () => {
 	const navigation = useNavigation<NavigationProps>();
 
 	useEffect(() => {
-		registerForPushNotificationsAsync().then((token) => {
-			// if (token) {
-			// 	setExpoPushToken(token);
-			// }
-		});
+		registerForPushNotificationsAsync().then(() => {});
 
-		// What to do when the app is in the background, the user receives a notification
-		notificationListener.current = Notifications.addNotificationReceivedListener((notification) => {
-			// Handle received notification
-		});
+		notificationListener.current = Notifications.addNotificationReceivedListener(() => {});
 
-		// What do do when the app is in the background, the user presses the notification
 		responseListener.current = Notifications.addNotificationResponseReceivedListener((response) => {
 			const { data } = response.notification.request.content;
 			const chatId = data["chatId"];
 
 			if (chatId) {
-				// Navigate the user to that chat screen
-				// const pushAction = StackActions.push("Chat", { chatId });
-				// navigation.dispatch(pushAction);
-				// OR
 				navigation.navigate("Chat", { chatId });
 			} else {
 				console.log("No chat id sent with notification");
@@ -72,121 +57,241 @@ const LoggedInNavigator = () => {
 	}, []);
 
 	useEffect(() => {
-		console.log("Subscribing to firebase listeners");
+		console.log("Subscribing to Supabase listeners");
 
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
+		const channels: RealtimeChannel[] = [];
 
-		// Get all the chats for the currently logged in user
-		const userChatsRef = child(dbRef, `userChats/${userData.userId}`);
-		const refs = [userChatsRef];
+		const loadInitialData = async () => {
+			try {
+				// Get all chat IDs for this user
+				const { data: chatUserRows } = await supabase
+					.from("chat_users")
+					.select("chat_id")
+					.eq("user_id", userData.userId);
 
-		onValue(userChatsRef, (querySnapshot) => {
-			const chatIdsData = querySnapshot.val() || {};
-			const chatIds: string[] = Object.values(chatIdsData); // array of chat ids: [chatId1, chatId2, ...]
+				const chatIds = chatUserRows?.map((r) => r.chat_id) || [];
 
-			// fetch the data for each chat
-			const chatsData: any = {};
-			let chatsFoundCount = 0;
+				if (chatIds.length === 0) {
+					setIsLoading(false);
+					return;
+				}
 
-			if (chatIds.length === 0) {
-				setIsLoading(false);
-			}
+				// Fetch all chats
+				const { data: chatsRows } = await supabase
+					.from("chats")
+					.select("*")
+					.in("chat_id", chatIds);
 
-			for (let i = 0; i < chatIds.length; i++) {
-				const chatId = chatIds[i];
-				const chatRef = child(dbRef, `chats/${chatId}`);
-				refs.push(chatRef);
+				const chatsData: Record<string, ChatData> = {};
 
-				onValue(chatRef, (chatSnapshot) => {
-					chatsFoundCount++;
+				for (const chat of chatsRows || []) {
+					// Get users for this chat
+					const { data: chatMembers } = await supabase
+						.from("chat_users")
+						.select("user_id")
+						.eq("chat_id", chat.chat_id);
 
-					const data: ChatData = chatSnapshot.val();
+					const userIds = chatMembers?.map((m) => m.user_id) || [];
 
-					if (data) {
-						data.users.forEach((userId) => {
-							if (storedUsers[userId]) return; // user data already exists in redux store
+					// Fetch user data for unknown users
+					for (const uid of userIds) {
+						if (!storedUsers[uid]) {
+							const { data: userRow } = await supabase
+								.from("users")
+								.select("*")
+								.eq("user_id", uid)
+								.single();
 
-							const userRef = child(dbRef, `users/${userId}`);
-
-							get(userRef).then((userSnapshot) => {
-								const userSnapshotData = userSnapshot.val() as UserData;
-								dispatch(setStoredUsers({ newUsers: { [userSnapshotData.userId]: userSnapshotData } }));
-							});
-
-							refs.push(userRef);
-						});
-
-						data.key = chatSnapshot.key!;
-						data.chatId = chatSnapshot.key!;
-						chatsData[data.key] = data;
-					}
-
-					if (chatsFoundCount >= chatIds.length) {
-						dispatch(setChatsData({ chatsData }));
-						setIsLoading(false);
-						chatsFoundCount = 0;
-					}
-
-					// get the statuses of each user in the chat (only get the statuses for direct chat users ignore group chat users)
-					if (!data.isGroupChat) {
-						const otherUserId = data.users.find((userId) => userId !== userData.userId);
-
-						if (otherUserId) {
-							const userStatusRef = child(dbRef, `userStatus/${otherUserId}`);
-							refs.push(userStatusRef);
-							onValue(userStatusRef, (userStatusSnapshot) => {
-								const userStatusData = userStatusSnapshot.val();
-								const userStatuses = [] as Status[];
-								for (const key in userStatusData) {
-									const status = userStatusData[key];
-									status.statusId = key;
-									userStatuses.push(status);
-								}
+							if (userRow) {
 								dispatch(
-									setContactStatuses({
-										statuses: userStatuses,
-										userId: otherUserId,
+									setStoredUsers({
+										newUsers: {
+											[userRow.user_id]: {
+												userId: userRow.user_id,
+												firstName: userRow.first_name,
+												lastName: userRow.last_name,
+												firstLast: userRow.first_last,
+												email: userRow.email,
+												about: userRow.about || "",
+												profilePicture: userRow.profile_picture || "",
+												signUpDate: userRow.sign_up_date,
+											},
+										},
 									})
 								);
-							});
+							}
 						}
 					}
-				});
 
-				// get the messages for each chat
-				const messagesRef = child(dbRef, `messages/${chatId}`);
-				refs.push(messagesRef);
+					const chatData: any = {
+						key: chat.chat_id,
+						chatId: chat.chat_id,
+						users: userIds,
+						isGroupChat: chat.is_group_chat,
+						chatName: chat.chat_name || "",
+						chatImage: chat.chat_image || "",
+						createdBy: chat.created_by,
+						updatedBy: chat.updated_by,
+						createdAt: chat.created_at,
+						updatedAt: chat.updated_at,
+						latestMessageText: chat.latest_message_text || "",
+					};
 
-				onValue(messagesRef, (messagesSnapshot) => {
-					const messagesData = messagesSnapshot.val();
-					dispatch(setChatMessages({ chatId, messagesData }));
-				});
+					chatsData[chat.chat_id] = chatData;
 
-				if (chatsFoundCount == 0) {
-					setIsLoading(false);
+					// Load statuses for direct chat contacts
+					if (!chat.is_group_chat) {
+						const otherUserId = userIds.find((uid: string) => uid !== userData.userId);
+						if (otherUserId) {
+							await loadContactStatuses(otherUserId);
+						}
+					}
 				}
-			}
-		});
 
-		// Get the statuses of currently logged in user (his own sttaues)
-		const userStatusRef = child(dbRef, `userStatus/${userData.userId}`);
-		refs.push(userStatusRef);
-		onValue(userStatusRef, (userStatusSnapshot) => {
-			const userStatusData = userStatusSnapshot.val();
-			const myStatues = [] as Status[];
-			for (const key in userStatusData) {
-				const status = userStatusData[key];
-				status.statusId = key;
-				myStatues.push(status);
+				dispatch(setChatsData({ chatsData }));
+
+				// Load messages for all chats
+				for (const chatId of chatIds) {
+					await loadMessages(chatId);
+				}
+
+				// Load own statuses
+				await loadMyStatuses();
+
+				setIsLoading(false);
+			} catch (error) {
+				console.log("Error loading initial data:", error);
+				setIsLoading(false);
 			}
-			dispatch(setMyStatuses({ statuses: myStatues }));
-			// console.log("userStatusData", userStatusData);
-		});
+		};
+
+		const loadMessages = async (chatId: string) => {
+			const { data: messagesRows } = await supabase
+				.from("messages")
+				.select("*, message_seen(*)")
+				.eq("chat_id", chatId)
+				.order("sent_at", { ascending: true });
+
+			const messagesData: Record<string, any> = {};
+			messagesRows?.forEach((msg) => {
+				const seen: Record<string, any> = {};
+				msg.message_seen?.forEach((s: any, i: number) => {
+					seen[i.toString()] = {
+						seenBy: s.seen_by,
+						seenAt: s.seen_at,
+					};
+				});
+
+				messagesData[msg.message_id] = {
+					sentBy: msg.sent_by,
+					sentAt: msg.sent_at,
+					text: msg.text,
+					imageUrl: msg.image_url || "",
+					replyTo: msg.reply_to || "",
+					type: msg.type || "text",
+					updatedAt: msg.updated_at || "",
+					seen,
+				};
+			});
+
+			dispatch(setChatMessages({ chatId, messagesData }));
+		};
+
+		const loadContactStatuses = async (userId: string) => {
+			const { data: statusRows } = await supabase
+				.from("user_statuses")
+				.select("*, status_views(*)")
+				.eq("user_id", userId)
+				.order("created_at", { ascending: true });
+
+			const userStatuses: Status[] = [];
+			statusRows?.forEach((row) => {
+				const views: Record<string, any> = {};
+				row.status_views?.forEach((view: any, i: number) => {
+					views[i.toString()] = {
+						viewerId: view.viewer_id,
+						viewedAt: view.viewed_at,
+					};
+				});
+
+				userStatuses.push({
+					statusId: row.status_id,
+					imageUrl: row.image_url,
+					createdAt: row.created_at,
+					views,
+				} as Status);
+			});
+
+			dispatch(setContactStatuses({ statuses: userStatuses, userId }));
+		};
+
+		const loadMyStatuses = async () => {
+			const { data: statusRows } = await supabase
+				.from("user_statuses")
+				.select("*, status_views(*)")
+				.eq("user_id", userData.userId)
+				.order("created_at", { ascending: true });
+
+			const myStatuses: Status[] = [];
+			statusRows?.forEach((row) => {
+				const views: Record<string, any> = {};
+				row.status_views?.forEach((view: any, i: number) => {
+					views[i.toString()] = {
+						viewerId: view.viewer_id,
+						viewedAt: view.viewed_at,
+					};
+				});
+
+				myStatuses.push({
+					statusId: row.status_id,
+					imageUrl: row.image_url,
+					createdAt: row.created_at,
+					views,
+				} as Status);
+			});
+
+			dispatch(setMyStatuses({ statuses: myStatuses }));
+		};
+
+		// Set up realtime subscriptions
+		const messagesChannel = supabase
+			.channel("messages-changes")
+			.on("postgres_changes", { event: "*", schema: "public", table: "messages" }, (payload) => {
+				const chatId = (payload.new as any)?.chat_id;
+				if (chatId) loadMessages(chatId);
+			})
+			.subscribe();
+		channels.push(messagesChannel);
+
+		const chatsChannel = supabase
+			.channel("chats-changes")
+			.on("postgres_changes", { event: "*", schema: "public", table: "chats" }, () => {
+				loadInitialData();
+			})
+			.subscribe();
+		channels.push(chatsChannel);
+
+		const chatUsersChannel = supabase
+			.channel("chat-users-changes")
+			.on("postgres_changes", { event: "*", schema: "public", table: "chat_users" }, () => {
+				loadInitialData();
+			})
+			.subscribe();
+		channels.push(chatUsersChannel);
+
+		const statusesChannel = supabase
+			.channel("statuses-changes")
+			.on("postgres_changes", { event: "*", schema: "public", table: "user_statuses" }, () => {
+				loadMyStatuses();
+			})
+			.subscribe();
+		channels.push(statusesChannel);
+
+		loadInitialData();
 
 		return () => {
-			console.log("Unsubscribing firebase listeners");
-			refs.forEach((ref) => off(ref));
+			console.log("Unsubscribing Supabase listeners");
+			channels.forEach((ch) => supabase.removeChannel(ch));
 		};
 	}, []);
 

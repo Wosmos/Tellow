@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { MenuProvider } from "react-native-popup-menu";
 import * as SplashScreen from "expo-splash-screen";
-import { LogBox } from "react-native";
 import * as Font from "expo-font";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import AppNavigator from "./src/navigation";
@@ -11,11 +10,6 @@ import { store } from "./src/utils/store";
 
 // Keep the splash screen visible while we fetch resources(fonts)
 SplashScreen.preventAutoHideAsync();
-
-LogBox.ignoreLogs([
-	"ViewPropTypes will be removed",
-	"You are initializing Firebase Auth for React Native without providing AsyncStorage.",
-]);
 
 export default function App() {
 	const [appIsReady, setAppIsReady] = useState(false);

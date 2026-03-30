@@ -1,5 +1,4 @@
-import { child, getDatabase, ref, set, get, update, push } from "firebase/database";
-import { getFirebaseApp } from "../firebase";
+import { supabase } from "../supabase";
 
 type SetUserStausParams = {
 	userId: string;
@@ -9,17 +8,10 @@ type SetUserStausParams = {
 export const setUserStatus = async (data: SetUserStausParams) => {
 	const { userId, status } = data;
 	try {
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
-		const userStatusRef = child(dbRef, `userStatus/${userId}`);
-
-		const userStatus = {
-			imageUrl: status,
-			createdAt: new Date().toISOString(),
-			views: {},
-		};
-
-		await push(userStatusRef, userStatus);
+		await supabase.from("user_statuses").insert({
+			user_id: userId,
+			image_url: status,
+		});
 	} catch (error) {
 		console.log(error);
 	}
@@ -27,12 +19,31 @@ export const setUserStatus = async (data: SetUserStausParams) => {
 
 export const getUserStatuses = async (userId: string) => {
 	try {
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
-		const userStatusRef = child(dbRef, `userStatus/${userId}`);
+		const { data, error } = await supabase
+			.from("user_statuses")
+			.select("*, status_views(*)")
+			.eq("user_id", userId)
+			.order("created_at", { ascending: true });
 
-		const snapshot = await get(userStatusRef);
-		const statuses = snapshot.val();
+		if (error) throw error;
+
+		// Convert to the format the app expects
+		const statuses: Record<string, any> = {};
+		data?.forEach((row) => {
+			const views: Record<string, any> = {};
+			row.status_views?.forEach((view: any, i: number) => {
+				views[i.toString()] = {
+					viewerId: view.viewer_id,
+					viewedAt: view.viewed_at,
+				};
+			});
+
+			statuses[row.status_id] = {
+				imageUrl: row.image_url,
+				createdAt: row.created_at,
+				views,
+			};
+		});
 
 		return statuses;
 	} catch (error) {
@@ -46,48 +57,29 @@ type DeleteUserStatusParams = {
 };
 
 export const deleteUserStatus = async (data: DeleteUserStatusParams) => {
-	const { statusId, userId } = data;
+	const { statusId } = data;
 
 	try {
-		const userStatuses = await getUserStatuses(userId);
-
-		for (const key in userStatuses) {
-			if (key === statusId) {
-				delete userStatuses[key];
-				break;
-			}
-		}
-
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
-		const userStatusesRef = child(dbRef, `userStatus/${userId}`);
-
-		await set(userStatusesRef, userStatuses);
+		await supabase.from("user_statuses").delete().eq("status_id", statusId);
 	} catch (error) {
 		console.log(error);
 	}
 };
 
 type UpdateUserStatusViewsParams = {
-	userId: string; // status owner whose status is being viewed by the loggedInUser
+	userId: string;
 	statusId: string;
-	viewerId: string; // loggedInUserId
+	viewerId: string;
 };
 
 export const updateStatusViews = async (data: UpdateUserStatusViewsParams) => {
-	const { viewerId, statusId, userId } = data;
+	const { viewerId, statusId } = data;
 
 	try {
-		const app = getFirebaseApp();
-		const dbRef = ref(getDatabase(app));
-		const userStatusesRef = child(dbRef, `userStatus/${userId}/${statusId}/views`);
-
-		const viewData = {
-			viewerId,
-			viewedAt: new Date().toISOString(),
-		}
-
-		await push(userStatusesRef, viewData);
+		await supabase.from("status_views").insert({
+			status_id: statusId,
+			viewer_id: viewerId,
+		});
 	} catch (error) {
 		console.log(error);
 	}
