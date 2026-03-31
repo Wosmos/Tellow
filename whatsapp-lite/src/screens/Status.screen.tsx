@@ -5,17 +5,18 @@ import PageContainer from "../components/PageContainer";
 import PageTitle from "../components/PageTitle";
 import { useAppSelector } from "../utils/store";
 import UserItem from "../components/UserItem";
-import { colors } from "../constants";
-import { StackScreenProps } from "@react-navigation/stack";
-import { LoggedInStackParamList, LoggedInTabParamList } from "../navigation/types";
-import { CompositeScreenProps } from "@react-navigation/native";
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { useTheme } from "../constants";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { LoggedInStackParamList } from "../navigation/types";
 
 const { width, height } = Dimensions.get("window");
 
-type Props = CompositeScreenProps<BottomTabScreenProps<LoggedInTabParamList, "Status">, StackScreenProps<LoggedInStackParamList>>;
+type Props = {};
 
-const StatusScreen = (props: Props) => {
+const StatusScreen = (_props: Props) => {
+	const { theme } = useTheme();
+	const navigation = useNavigation<StackNavigationProp<LoggedInStackParamList>>();
 	const storedUsers = useAppSelector((state) => state.storedUsers.storedUsers);
 	const { contactsStatuses } = useAppSelector((state) => state.statuses);
 
@@ -44,7 +45,7 @@ const StatusScreen = (props: Props) => {
 							subTitle={subTitle}
 							image={image}
 							onPress={() =>
-								props.navigation.navigate("UserStatuses", { statuses: contactStatuses, userId: contactuserId, username: title })
+								navigation.navigate("UserStatuses", { statuses: contactStatuses, userId: contactuserId, username: title })
 							}
 							type="user"
 						/>
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 	},
 	heading: {
-		color: colors.textColor,
+		color: "#1c1e21",
 		fontFamily: "bold",
 		letterSpacing: 0.3,
 		marginTop: 30,

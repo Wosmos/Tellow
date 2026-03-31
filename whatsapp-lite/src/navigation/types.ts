@@ -24,6 +24,8 @@ export type LoggedInStackParamList = {
 
 export type LoggedInTabParamList = {
 	ChatList: { selectedUserId?: string };
+	Calls: undefined;
+	Saved: undefined;
+	Contacts: undefined;
 	Settings: { userId: string };
-	Status: {};
 };

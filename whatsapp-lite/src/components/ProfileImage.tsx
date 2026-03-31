@@ -1,14 +1,12 @@
 import React, { useState } from "react";
-import { ActivityIndicator, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-
 import userImage from "../../assets/images/userImage.jpeg";
-
 import { updateSignedInUserData } from "../utils/actions/authActions";
 import { useAppDispatch } from "../utils/store";
 import { launchImagePicker, uploadImageAsync } from "../utils/imagePickerHelper";
 import { updateLoggedInUserData } from "../utils/store/authSlice";
-import { colors } from "../constants";
+import { useTheme } from "../constants";
 import { updateChatData } from "../utils/actions/chatActions";
 
 type Props = {
@@ -19,43 +17,32 @@ type Props = {
 };
 
 const ProfileImage = (props: Props) => {
+	const { theme } = useTheme();
 	const dispatch = useAppDispatch();
-
 	const source = props.uri ? { uri: props.uri } : userImage;
-
 	const [image, setImage] = useState(source);
 	const [isLoading, setIsLoading] = useState(false);
-
-	const userId = props.userId;
-	const chatId = props.chatId;
 
 	const pickImage = async () => {
 		try {
 			const tempUri = await launchImagePicker();
-
 			if (!tempUri) return;
 
-			// Upload the image
 			setIsLoading(true);
 			const uploadUrl = await uploadImageAsync(tempUri);
 			setIsLoading(false);
 
-			if (!uploadUrl) {
-				throw new Error("Could not upload image");
-			}
+			if (!uploadUrl) throw new Error("Could not upload image");
 
-			// profile picture of group chat
-			if (chatId) {
+			if (props.chatId) {
 				await updateChatData({
-					chatId,
-					userId,
+					chatId: props.chatId,
+					userId: props.userId,
 					chatData: { chatImage: uploadUrl },
 				});
 			} else {
-				// profile picture of user
 				const newData = { profilePicture: uploadUrl };
-
-				await updateSignedInUserData(userId, newData);
+				await updateSignedInUserData(props.userId, newData);
 				dispatch(updateLoggedInUserData({ newData }));
 			}
 
@@ -69,15 +56,18 @@ const ProfileImage = (props: Props) => {
 	return (
 		<TouchableOpacity onPress={pickImage}>
 			{isLoading ? (
-				<View style={{ ...styles.loadingContainer, ...{ width: props.size, height: props.size } }}>
-					<ActivityIndicator size={"small"} color={colors.primary} />
+				<View style={[styles.loadingContainer, { width: props.size, height: props.size }]}>
+					<ActivityIndicator size="small" color={theme.colors.primary} />
 				</View>
 			) : (
-				<Image style={{ ...styles.image, ...{ width: props.size, height: props.size } }} source={image} />
+				<Image
+					style={[styles.image, { width: props.size, height: props.size, borderColor: theme.colors.border }]}
+					source={image}
+				/>
 			)}
 
-			<View style={styles.editIconContainer}>
-				<FontAwesome name="pencil" size={15} color="black" />
+			<View style={[styles.editIconContainer, { backgroundColor: theme.colors.primary }]}>
+				<FontAwesome name="camera" size={12} color="#fff" />
 			</View>
 		</TouchableOpacity>
 	);
@@ -86,16 +76,14 @@ const ProfileImage = (props: Props) => {
 const styles = StyleSheet.create({
 	image: {
 		borderRadius: 50,
-		borderColor: colors.gray,
 		borderWidth: 1,
 	},
 	editIconContainer: {
 		position: "absolute",
 		bottom: 0,
 		right: 0,
-		backgroundColor: colors.lightGray,
-		borderRadius: 20,
-		padding: 8,
+		borderRadius: 16,
+		padding: 6,
 	},
 	loadingContainer: {
 		justifyContent: "center",

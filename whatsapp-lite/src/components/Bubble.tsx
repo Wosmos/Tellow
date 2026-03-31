@@ -1,6 +1,6 @@
-import React, { useRef } from "react";
+import React from "react";
 import { StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
-import { colors } from "../constants";
+import { useTheme } from "../constants";
 
 type Props = {
 	type: "system" | "error" | "message";
@@ -10,6 +10,7 @@ type Props = {
 
 const Bubble = (props: Props) => {
 	const { type, text, subText } = props;
+	const { theme } = useTheme();
 
 	const bubbleStyle: ViewStyle = { ...styles.container };
 	const textStyle: TextStyle = { ...styles.text };
@@ -17,22 +18,26 @@ const Bubble = (props: Props) => {
 
 	switch (type) {
 		case "system":
-			textStyle.color = "#65644A";
-			bubbleStyle.backgroundColor = colors.beige;
+			textStyle.color = theme.colors.infoBubbleText;
+			bubbleStyle.backgroundColor = theme.colors.infoBubble;
 			bubbleStyle.alignItems = "center";
 			bubbleStyle.marginTop = 10;
+			bubbleStyle.borderWidth = 0;
 			break;
 		case "error":
-			bubbleStyle.backgroundColor = colors.red;
-			textStyle.color = "white";
+			bubbleStyle.backgroundColor = theme.colors.red;
+			textStyle.color = "#fff";
 			bubbleStyle.marginTop = 10;
+			bubbleStyle.borderWidth = 0;
 			break;
 		case "message":
-			textStyle.color = colors.textColor;
-			bubbleStyle.backgroundColor = "#E7FED6";
+			textStyle.color = theme.colors.sentBubbleText;
+			bubbleStyle.backgroundColor = theme.colors.sentBubble;
 			bubbleStyle.alignItems = "center";
 			bubbleStyle.maxWidth = "90%";
 			bubbleStyle.padding = 8;
+			bubbleStyle.borderWidth = 0;
+			break;
 		default:
 			break;
 	}
@@ -41,7 +46,7 @@ const Bubble = (props: Props) => {
 		<View style={wrapperStyle}>
 			<View style={bubbleStyle}>
 				<Text style={textStyle}>{text}</Text>
-				{subText && <Text style={styles.subText}>{subText}</Text>}
+				{subText && <Text style={[styles.subText, { color: theme.colors.textSecondary }]}>{subText}</Text>}
 			</View>
 		</View>
 	);
@@ -53,21 +58,19 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	container: {
-		backgroundColor: "white",
-		borderRadius: 6,
-		padding: 5,
+		borderRadius: 16,
+		padding: 10,
 		marginBottom: 10,
-		borderColor: "#E2DACC",
-		borderWidth: 1,
+		borderWidth: 0,
 	},
 	text: {
 		fontFamily: "regular",
 		letterSpacing: 0.3,
+		fontSize: 15,
 	},
 	subText: {
 		fontFamily: "regular",
 		letterSpacing: 0.1,
-		color: colors.gray,
 		fontSize: 12,
 		justifyContent: "flex-end",
 		marginTop: 5,

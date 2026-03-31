@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
+import { useTheme } from "../constants";
 
 type Props = {
 	children: React.ReactNode;
@@ -7,13 +8,18 @@ type Props = {
 };
 
 const PageContainer = (props: Props) => {
-	return <View style={{ ...styles.container, ...props.styles }}>{props.children}</View>;
+	const { theme } = useTheme();
+
+	return (
+		<View style={{ ...styles.container, backgroundColor: theme.colors.background, ...props.styles }}>
+			{props.children}
+		</View>
+	);
 };
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#fff",
 		paddingHorizontal: 20,
 	},
 });

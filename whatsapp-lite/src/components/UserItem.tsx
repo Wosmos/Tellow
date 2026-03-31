@@ -1,9 +1,8 @@
 import React from "react";
 import { GestureResponderEvent, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
-import ProfileImage from "./ProfileImage";
-import { colors } from "../constants";
-import UserImage from "./UserImage";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../constants";
+import UserImage from "./UserImage";
 
 const IMAGE_SIZE = 40;
 
@@ -19,41 +18,43 @@ type Props = {
 };
 
 const UserItem = (props: Props) => {
+	const { theme } = useTheme();
 	const { title, subTitle, image, onPress, isChecked, type, icon, hideImage } = props;
 
 	return (
 		<TouchableWithoutFeedback onPress={onPress}>
-			<View style={styles.container}>
+			<View style={[styles.container, { borderBottomColor: theme.colors.border }]}>
 				{icon ? (
-					<View style={styles.leftIconContainer}>
-						<AntDesign name={icon} size={20} color={colors.blue} />
+					<View style={[styles.leftIconContainer, { backgroundColor: theme.colors.inputBg }]}>
+						<AntDesign name={icon} size={20} color={theme.colors.primary} />
 					</View>
 				) : hideImage ? null : (
 					<UserImage uri={image} size={40} />
 				)}
 
 				<View style={styles.textContainer}>
-					<Text numberOfLines={1} style={styles.title}>
+					<Text numberOfLines={1} style={[styles.title, { color: theme.colors.text }]}>
 						{title}
 					</Text>
-
 					{subTitle && (
-						<Text numberOfLines={1} style={styles.subTitle}>
+						<Text numberOfLines={1} style={[styles.subTitle, { color: theme.colors.textSecondary }]}>
 							{subTitle}
 						</Text>
 					)}
 				</View>
 
 				{type === "group" && (
-					<View style={{ ...styles.iconContainer, ...(isChecked && styles.checkedStyle) }}>
+					<View style={[
+						styles.iconContainer,
+						{ borderColor: theme.colors.border },
+						isChecked && { backgroundColor: theme.colors.primary, borderColor: "transparent" },
+					]}>
 						<Ionicons name="checkmark" size={18} color="white" />
 					</View>
 				)}
 
 				{type === "link" && (
-					<View>
-						<Ionicons name="chevron-forward-outline" size={18} color={colors.gray} />
-					</View>
+					<Ionicons name="chevron-forward-outline" size={18} color={theme.colors.textSecondary} />
 				)}
 			</View>
 		</TouchableWithoutFeedback>
@@ -63,8 +64,7 @@ const UserItem = (props: Props) => {
 const styles = StyleSheet.create({
 	container: {
 		flexDirection: "row",
-		paddingVertical: 7,
-		borderBottomColor: colors.extraLightGrey,
+		paddingVertical: 8,
 		borderBottomWidth: 1,
 		alignItems: "center",
 		minHeight: 50,
@@ -80,21 +80,15 @@ const styles = StyleSheet.create({
 	},
 	subTitle: {
 		fontFamily: "regular",
-		color: colors.gray,
 		letterSpacing: 0.3,
+		marginTop: 2,
 	},
 	iconContainer: {
 		borderWidth: 1,
 		borderRadius: 50,
-		borderColor: colors.lightGray,
 		backgroundColor: "white",
 	},
-	checkedStyle: {
-		backgroundColor: colors.primary,
-		borderColor: "transparent",
-	},
 	leftIconContainer: {
-		backgroundColor: colors.extraLightGrey,
 		borderRadius: 50,
 		alignItems: "center",
 		justifyContent: "center",

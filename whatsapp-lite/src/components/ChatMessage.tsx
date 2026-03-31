@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, TextStyle, TouchableWithoutFeedback, View, Vie
 import { Feather, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { Menu, MenuTrigger, MenuOptions, MenuOption } from "react-native-popup-menu";
 import * as Clipboard from "expo-clipboard";
-import { colors } from "../constants";
+import { useTheme } from "../constants";
 import { Message, Seen } from "../utils/store/types";
 import { deleteMessage, markMessageAsSeen } from "../utils/actions/chatActions";
 import { formatAmPm } from "../utils/helperFns";
@@ -19,17 +19,33 @@ type MenuItemProps = {
 };
 
 const MenuItem = (props: MenuItemProps) => {
+	const { theme } = useTheme();
 	const Icon = props.iconPack ?? Feather;
 
 	return (
 		<MenuOption onSelect={props.onSelect}>
-			<View style={styles.menuItemContainer}>
-				<Text style={styles.menuText}>{props.text}</Text>
-				<Icon name={props.icon} size={18} />
+			<View style={menuStyles.itemContainer}>
+				<Icon name={props.icon} size={18} color={theme.colors.textSecondary} />
+				<Text style={[menuStyles.text, { color: theme.colors.text }]}>{props.text}</Text>
 			</View>
 		</MenuOption>
 	);
 };
+
+const menuStyles = StyleSheet.create({
+	itemContainer: {
+		flexDirection: "row",
+		alignItems: "center",
+		paddingVertical: 10,
+		paddingHorizontal: 16,
+		gap: 14,
+	},
+	text: {
+		fontFamily: "regular",
+		fontSize: 16,
+		letterSpacing: 0.3,
+	},
+});
 
 type Props = {
 	text: string;
@@ -38,8 +54,9 @@ type Props = {
 	edited?: boolean;
 	messageId: string;
 	chatId: string;
-	userId: string; // loggedInUserId
+	userId: string;
 	sentBy: string;
+	senderId?: string;
 	date: string;
 	setReplyingTo: () => void;
 	setEditMessage?: () => void;
@@ -55,6 +72,7 @@ type Props = {
 type NavigationProps = StackScreenProps<LoggedInStackParamList, "MessageInfo">["navigation"];
 
 const ChatMessage = (props: Props) => {
+	const { theme } = useTheme();
 	const navigation = useNavigation<NavigationProps>();
 	const {
 		text,
@@ -77,12 +95,21 @@ const ChatMessage = (props: Props) => {
 		isGroupChat,
 	} = props;
 
-	const messageStyle: ViewStyle = { ...styles.container };
-	const textStyle: TextStyle = { ...styles.text };
-	const wrapperStyle: ViewStyle = { ...styles.wrapperStyle };
+	const wrapperStyle: ViewStyle = {};
+	const messageStyle: ViewStyle = {
+		borderRadius: 18,
+		padding: 10,
+		paddingHorizontal: 14,
+		marginBottom: 4,
+		maxWidth: "80%",
+	};
+	const textStyle: TextStyle = {
+		fontFamily: "regular",
+		letterSpacing: 0.3,
+		fontSize: 15,
+	};
 
 	const dateString = formatAmPm(date);
-
 	const menuRef = useRef<any>(null);
 
 	const copyToClipboard = async (text: string) => {
@@ -94,76 +121,68 @@ const ChatMessage = (props: Props) => {
 	};
 
 	const showMessageMenu = () => {
-		if (props.type === "reply") return;
+		if (type === "reply") return;
 		menuRef.current?.props.ctx.menuActions.openMenu(messageId);
 	};
 
 	const deleteChatMessage = () => {
-		deleteMessage({
-			messageId,
-			chatId,
-			userId,
-		});
+		deleteMessage({ messageId, chatId, userId });
 	};
 
 	switch (type) {
 		case "myMessage":
 			wrapperStyle.flexDirection = "row";
 			wrapperStyle.justifyContent = "flex-end";
-			messageStyle.backgroundColor = "#E7FED6";
-			messageStyle.maxWidth = "90%";
+			messageStyle.backgroundColor = theme.colors.sentBubble;
+			textStyle.color = theme.colors.sentBubbleText;
+			messageStyle.borderBottomRightRadius = 4;
 			break;
 		case "theirMessage":
 			wrapperStyle.flexDirection = "row";
 			wrapperStyle.justifyContent = "flex-start";
-			messageStyle.maxWidth = "90%";
+			messageStyle.backgroundColor = theme.colors.receivedBubble;
+			textStyle.color = theme.colors.receivedBubbleText;
+			messageStyle.borderBottomLeftRadius = 4;
 			break;
 		case "reply":
-			messageStyle.backgroundColor = "#F2F2F2";
-			wrapperStyle.borderLeftColor = colors.blue;
-			wrapperStyle.borderLeftWidth = 4;
+			messageStyle.backgroundColor = theme.dark ? theme.colors.surfaceElevated : "#F2F2F2";
+			messageStyle.borderLeftColor = theme.colors.primary;
+			messageStyle.borderLeftWidth = 3;
+			messageStyle.borderRadius = 8;
+			messageStyle.maxWidth = "100%";
+			textStyle.color = theme.colors.text;
 			break;
 		case "info":
 			wrapperStyle.alignItems = "center";
 			messageStyle.alignItems = "center";
-			messageStyle.backgroundColor = colors.beige;
-			textStyle.color = colors.textColor;
+			messageStyle.backgroundColor = theme.colors.infoBubble;
+			messageStyle.maxWidth = "80%";
+			textStyle.color = theme.colors.infoBubbleText;
+			textStyle.fontSize = 13;
 			break;
 		default:
 			break;
 	}
 
 	useEffect(() => {
-		// user is viewing his/her own message
-		if (type === "myMessage") {
-			console.log("is my message");
-			return;
-		}
-
-		// user is viewing other users message
-		// mark the other user's message as seen by the currently loggedIn user
+		if (type === "myMessage") return;
 		const isAlreadySeen = totalSeens && totalSeens.find((seen) => seen.seenBy === userId);
+		if (isAlreadySeen) return;
 
-		if (isAlreadySeen) {
-			console.log("Already seen by the user");
-			return;
-		}
-
-		console.log("seen");
-		markMessageAsSeen({
-			chatId,
-			messageId,
-			seenBy: userId,
-		});
+		markMessageAsSeen({ chatId, messageId, seenBy: userId });
 	}, [chatId]);
 
 	const isSeen = !!(totalSeens && totalSeens.length > 0);
+
+	const timeColor = theme.colors.textSecondary;
 
 	return (
 		<View style={wrapperStyle}>
 			<TouchableWithoutFeedback style={{ width: "100%" }} onLongPress={showMessageMenu} onPress={scrollToRepliedMessage}>
 				<View style={messageStyle}>
-					{type !== "info" && name && <Text style={styles.name}>{name}</Text>}
+					{type !== "info" && name && (
+						<Text style={[styles.name, { color: theme.colors.primary }]}>{name}</Text>
+					)}
 
 					{replyTo && replyToUser && (
 						<ChatMessage
@@ -183,8 +202,8 @@ const ChatMessage = (props: Props) => {
 
 					{deleted ? (
 						<View style={styles.deletedMessageContainer}>
-							<MaterialIcons name="not-interested" size={18} color="black" />
-							<Text style={{ ...textStyle, fontFamily: "italic" }}>This message has been deleted</Text>
+							<MaterialIcons name="not-interested" size={16} color={timeColor} />
+							<Text style={{ ...textStyle, fontFamily: "italic", fontSize: 14 }}>Message deleted</Text>
 						</View>
 					) : imageUrl ? (
 						<Image source={{ uri: imageUrl }} style={styles.image} />
@@ -192,25 +211,43 @@ const ChatMessage = (props: Props) => {
 						<Text style={textStyle}>{text}</Text>
 					)}
 
-					{props.type !== "reply" && (
+					{type !== "reply" && (
 						<View style={styles.timeContainer}>
-							<Text style={styles.time}>
-								{`${edited ? "Edited " : ""}`} {dateString}
+							<Text style={[styles.time, { color: timeColor }]}>
+								{edited ? "Edited " : ""}{dateString}
 							</Text>
 							{!deleted && type === "myMessage" && (
-								<Ionicons name="md-checkmark-done-sharp" size={13} color={isSeen ? colors.blue : colors.gray} />
+								<Ionicons
+									name="md-checkmark-done-sharp"
+									size={13}
+									color={isSeen ? theme.colors.primary : theme.colors.textSecondary}
+								/>
 							)}
 						</View>
 					)}
 				</View>
 			</TouchableWithoutFeedback>
 
-			{props.type !== "reply" && !deleted && (
+			{type !== "reply" && !deleted && (
 				<Menu ref={menuRef} name={messageId}>
 					<MenuTrigger />
-					<MenuOptions>
-						<MenuItem text="Copy to clipboard" icon="copy" onSelect={() => copyToClipboard(text)} />
-						<MenuItem text="Reply" icon="arrow-left-circle" onSelect={setReplyingTo} />
+					<MenuOptions
+						customStyles={{
+							optionsContainer: {
+								backgroundColor: theme.colors.menuBg,
+								borderRadius: 14,
+								paddingVertical: 4,
+								width: 200,
+								shadowColor: "#000",
+								shadowOffset: { width: 0, height: 4 },
+								shadowOpacity: 0.15,
+								shadowRadius: 12,
+								elevation: 8,
+							},
+						}}
+					>
+						<MenuItem text="Reply" icon="corner-up-left" onSelect={setReplyingTo} />
+						<MenuItem text="Copy" icon="copy" onSelect={() => copyToClipboard(text)} />
 						{type === "myMessage" && (
 							<>
 								<MenuItem
@@ -235,15 +272,11 @@ const ChatMessage = (props: Props) => {
 									<MenuItem
 										text="Edit"
 										icon="pencil"
-										onSelect={() => {
-											if (setEditMessage) {
-												setEditMessage();
-											}
-										}}
+										onSelect={() => setEditMessage?.()}
 										iconPack={MaterialCommunityIcons}
 									/>
 								)}
-								<MenuItem text="Delete for everyone" icon="delete" onSelect={deleteChatMessage} iconPack={MaterialIcons} />
+								<MenuItem text="Delete" icon="delete" onSelect={deleteChatMessage} iconPack={MaterialIcons} />
 							</>
 						)}
 					</MenuOptions>
@@ -254,51 +287,28 @@ const ChatMessage = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
-	wrapperStyle: {},
-	container: {
-		backgroundColor: "white",
-		borderRadius: 6,
-		padding: 5,
-		marginBottom: 10,
-		borderColor: "#E2DACC",
-		borderWidth: 1,
-	},
-	text: {
-		fontFamily: "regular",
-		letterSpacing: 0.3,
-	},
-	menuItemContainer: {
-		flexDirection: "row",
-		padding: 5,
-	},
-	menuText: {
-		flex: 1,
-		fontFamily: "regular",
-		letterSpacing: 0.3,
-		fontSize: 16,
-	},
 	timeContainer: {
 		flexDirection: "row",
 		justifyContent: "flex-end",
 		alignItems: "center",
-		gap: 1,
-		marginTop: 5,
+		gap: 3,
+		marginTop: 4,
 	},
 	time: {
 		fontFamily: "regular",
-		letterSpacing: 0.3,
-		color: colors.gray,
-		fontSize: 12,
+		fontSize: 11,
 	},
 	name: {
 		fontFamily: "medium",
 		letterSpacing: 0.3,
-		marginBottom: 6,
+		marginBottom: 4,
+		fontSize: 13,
 	},
 	image: {
-		width: 300,
-		height: 300,
-		marginBottom: 5,
+		width: 250,
+		height: 250,
+		borderRadius: 12,
+		marginBottom: 4,
 	},
 	deletedMessageContainer: {
 		flexDirection: "row",

@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { colors } from "../constants";
+import { useTheme } from "../constants";
 import { UserData } from "../utils/store/types";
 
 type Props = {
@@ -12,20 +12,21 @@ type Props = {
 };
 
 const ReplyingTo = (props: Props) => {
+	const { theme } = useTheme();
 	const { text, user, onCancel, loggedInUser } = props;
 	const name = user.userId === loggedInUser.userId ? "You" : `${user.firstName} ${user.lastName}`;
 
 	return (
-		<View style={styles.container}>
+		<View style={[styles.container, { backgroundColor: theme.colors.inputBg, borderLeftColor: theme.colors.primary }]}>
 			<View style={styles.textContainer}>
-				<Text numberOfLines={1} style={styles.name}>
+				<Text numberOfLines={1} style={[styles.name, { color: theme.colors.primary }]}>
 					{name}
 				</Text>
-				<Text numberOfLines={1}>{text}</Text>
+				<Text numberOfLines={1} style={{ color: theme.colors.text }}>{text}</Text>
 			</View>
 
 			<TouchableOpacity onPress={onCancel}>
-				<AntDesign name="closecircleo" size={24} color={colors.blue} />
+				<AntDesign name="closecircleo" size={22} color={theme.colors.textSecondary} />
 			</TouchableOpacity>
 		</View>
 	);
@@ -33,21 +34,22 @@ const ReplyingTo = (props: Props) => {
 
 const styles = StyleSheet.create({
 	container: {
-		backgroundColor: colors.extraLightGrey,
-		padding: 8,
+		padding: 10,
 		flexDirection: "row",
 		alignItems: "center",
-		borderLeftColor: colors.blue,
-		borderLeftWidth: 4,
+		borderLeftWidth: 3,
+		marginHorizontal: 12,
+		marginBottom: 4,
+		borderRadius: 8,
 	},
 	textContainer: {
 		flex: 1,
-		marginRight: 5,
+		marginRight: 8,
 	},
 	name: {
-		color: colors.blue,
 		fontFamily: "medium",
 		letterSpacing: 0.3,
+		marginBottom: 2,
 	},
 });
 

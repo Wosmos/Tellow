@@ -1,92 +1,110 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, TextInput, View, TextInputProps } from "react-native";
-import { FontAwesome, MaterialCommunityIcons, MaterialIcons, Ionicons, Feather } from "@expo/vector-icons";
-
-import { colors } from "../constants";
-
-// type Icon = typeof FontAwesome | typeof MaterialCommunityIcons | typeof MaterialIcons | typeof Ionicons | typeof Feather;
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  TextInputProps,
+} from "react-native";
+import { useTheme } from "../constants";
 
 type Props = TextInputProps & {
-	id: string;
-	label: string;
-	icon?: any;
-	iconPack?: any;
-	iconSize?: number;
-	errorText: string[] | undefined;
-	onInputChanged: (inputId: string, inputValue: string) => void;
-	initialValue?: string;
+  id: string;
+  label: string;
+  icon?: any;
+  iconPack?: any;
+  iconSize?: number;
+  errorText: string[] | undefined;
+  onInputChanged: (inputId: string, inputValue: string) => void;
+  initialValue?: string;
 };
 
 const Input = (props: Props) => {
-	const IconPack = props.iconPack;
+  const { theme } = useTheme();
+  const IconPack = props.iconPack;
+  const [value, setValue] = useState(props.initialValue);
+  const [isFocused, setIsFocused] = useState(false);
 
-	const [value, setValue] = useState(props.initialValue);
+  const onChangeText = (text: string) => {
+    setValue(text);
+    props.onInputChanged(props.id, text);
+  };
 
-	const onChangeText = (text: string) => {
-		setValue(text);
-		props.onInputChanged(props.id, text);
-	};
-
-	return (
-		<View style={styles.container}>
-			<Text style={styles.label}>{props.label}</Text>
-			<View style={styles.inputContainer}>
-				{IconPack && props.icon && <IconPack name={props.icon} size={props.iconSize || 15} style={styles.icon} />}
-				<TextInput style={styles.input} onChangeText={onChangeText} value={value} {...props} />
-			</View>
-
-			{props.errorText && (
-				<View style={styles.errorContainer}>
-					<Text style={styles.errorText}>{props.errorText[0]}</Text>
-				</View>
-			)}
-		</View>
-	);
+  return (
+    <View style={styles.container}>
+      <Text style={[styles.label, { color: theme.colors.text }]}>
+        {props.label}
+      </Text>
+      <View
+        style={[
+          styles.inputRow,
+          { backgroundColor: theme.colors.inputBg },
+          isFocused && { borderColor: theme.colors.primary },
+        ]}
+      >
+        {IconPack && props.icon && (
+          <IconPack
+            name={props.icon}
+            size={props.iconSize || 18}
+            color={theme.colors.textSecondary}
+            style={styles.icon}
+          />
+        )}
+        <TextInput
+          style={[styles.input, { color: theme.colors.text }]}
+          onChangeText={onChangeText}
+          value={value}
+          placeholderTextColor={theme.colors.textSecondary}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          {...props}
+        />
+      </View>
+      {props.errorText && (
+        <Text style={[styles.error, { color: theme.colors.red }]}>
+          {props.errorText[0]}
+        </Text>
+      )}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-	container: {
-		width: "100%",
-	},
-	label: {
-		fontFamily: "bold",
-		// fontSize: 16,
-		marginVertical: 8,
-		letterSpacing: 0.3,
-		color: colors.textColor,
-	},
-	input: {
-		flex: 1,
-		height: 50,
-		color: colors.textColor,
-		fontFamily: "regular",
-		letterSpacing: 0.3,
-		paddingTop: 0,
-	},
-	inputContainer: {
-		backgroundColor: colors.almostWhite,
-		width: "100%",
-		paddingHorizontal: 10,
-		paddingVertical: 15,
-		height: 50,
-		borderRadius: 8,
-		borderColor: "#000",
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	icon: {
-		marginRight: 10,
-		color: colors.gray,
-	},
-	errorContainer: {
-		marginVertical: 5,
-	},
-	errorText: {
-		color: "red",
-		fontSize: 13,
-		fontFamily: "regular",
-		letterSpacing: 0.3,
-	},
+  container: {
+    width: "100%",
+    marginBottom: 6,
+  },
+  label: {
+    fontFamily: "medium",
+    fontSize: 13,
+    marginBottom: 8,
+    marginTop: 14,
+  },
+  inputRow: {
+    width: "100%",
+    height: 52,
+    borderRadius: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderColor: "transparent",
+  },
+  input: {
+    flex: 1,
+    height: 52,
+    fontFamily: "regular",
+    fontSize: 15,
+    paddingTop: 0,
+  },
+  icon: {
+    marginRight: 12,
+  },
+  error: {
+    fontSize: 12,
+    fontFamily: "regular",
+    marginTop: 4,
+  },
 });
 
 export default Input;
