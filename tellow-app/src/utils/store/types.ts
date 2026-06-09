@@ -7,6 +7,7 @@ export type UserData = {
 	signUpDate: string;
 	about?: string;
 	profilePicture?: string;
+	phoneNumber?: string;
 	pushTokens?: {
 		[id: string]: string;
 	};

@@ -12,6 +12,7 @@ import { ActivityIndicator, View } from "react-native";
 import { colors, commonStyles } from "../constants";
 import { registerForPushNotificationsAsync } from "../utils/notifications";
 import { setContactStatuses, setMyStatuses } from "../utils/store/statusSlice";
+import { fetchContacts } from "../utils/actions/contactActions";
 import { StackScreenProps } from "@react-navigation/stack";
 import { LoggedInStackParamList } from "./types";
 import { RealtimeChannel } from "@supabase/supabase-js";
@@ -114,6 +115,7 @@ const LoggedInNavigator = () => {
 												email: userRow.email,
 												about: userRow.about || "",
 												profilePicture: userRow.profile_picture || "",
+												phoneNumber: userRow.phone_number || "",
 												signUpDate: userRow.sign_up_date,
 											},
 										},
@@ -157,6 +159,9 @@ const LoggedInNavigator = () => {
 
 				// Load own statuses
 				await loadMyStatuses();
+
+				// Load contacts
+				await dispatch(fetchContacts(userData.userId));
 
 				setIsLoading(false);
 			} catch (error) {

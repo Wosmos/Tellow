@@ -6,6 +6,7 @@ import type { StackScreenProps } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 import { LoggedInStackParamList, LoggedInTabParamList } from "../navigation/types";
 import { useAppSelector } from "../utils/store";
+import { selectSortedChats } from "../utils/store/selectors";
 import UserImage from "../components/UserImage";
 import { useTheme } from "../constants";
 
@@ -16,12 +17,7 @@ const ChatListScreen = (props: Props) => {
 	const userData = useAppSelector((state) => state.auth.userData)!;
 	const storedUsers = useAppSelector((state) => state.storedUsers.storedUsers);
 
-	const userChats = useAppSelector((state) => {
-		const chatsData = state.chats.chatsData;
-		return Object.values(chatsData).sort((a, b) => {
-			return new Date(b.updatedAt).valueOf() - new Date(a.updatedAt).valueOf();
-		});
-	});
+	const userChats = useAppSelector(selectSortedChats);
 
 	useLayoutEffect(() => {
 		props.navigation.setOptions({

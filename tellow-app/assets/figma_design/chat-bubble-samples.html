@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Bubble Styles — 4 Samples</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  background: #0D0D18;
+  min-height: 100vh;
+  padding: 48px 24px 64px;
+}
+
+h1 { text-align: center; color: white; font-size: 30px; font-weight: 800; margin-bottom: 6px; letter-spacing: -0.5px; }
+.page-sub { text-align: center; color: rgba(255,255,255,0.38); font-size: 14px; margin-bottom: 52px; font-weight: 500; }
+
+.grid { display: flex; justify-content: center; gap: 36px; flex-wrap: wrap; align-items: flex-start; }
+.col  { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.style-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.82); text-align: center; }
+.style-sub  { font-size: 11px; color: rgba(255,255,255,0.32); text-align: center; font-weight: 500; margin-top: -8px; max-width: 200px; line-height: 1.5; }
+
+.phone {
+  width: 295px; height: 580px;
+  border-radius: 44px; overflow: hidden;
+  display: flex; flex-direction: column;
+  position: relative; flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 30px 80px rgba(0,0,0,0.7), 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.status-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 22px 2px; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.chat-header { display: flex; align-items: center; gap: 10px; padding: 6px 14px 10px; flex-shrink: 0; }
+.back-btn { font-size: 22px; line-height: 1; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: white; flex-shrink: 0; }
+.contact-name { font-size: 14px; font-weight: 600; line-height: 1.2; }
+.contact-status { font-size: 11px; color: #34C759; font-weight: 500; }
+.header-actions { margin-left: auto; font-size: 18px; display: flex; gap: 14px; opacity: 0.65; }
+
+.messages { flex: 1; overflow: hidden; padding: 10px 14px; display: flex; flex-direction: column; gap: 2px; }
+.date-pill { align-self: center; font-size: 11px; font-weight: 600; padding: 3px 12px; border-radius: 10px; margin: 4px 0 8px; }
+
+.msg { display: flex; align-items: flex-end; gap: 6px; margin-bottom: 3px; }
+.msg.sent     { justify-content: flex-end; }
+.msg.received { justify-content: flex-start; }
+
+.bubble { max-width: 198px; padding: 9px 14px; font-size: 13.5px; line-height: 1.42; position: relative; word-wrap: break-word; }
+.msg-time { font-size: 10px; opacity: 0.48; padding-bottom: 2px; flex-shrink: 0; white-space: nowrap; }
+.delivered { font-size: 10px; text-align: right; margin-top: 1px; opacity: 0.42; padding-right: 3px; }
+
+.input-bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px 22px; flex-shrink: 0; }
+.input-wrap { flex: 1; border-radius: 22px; padding: 8px 14px; font-size: 13px; font-family: inherit; display: flex; align-items: center; gap: 8px; opacity: 0.6; }
+.send-btn { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+
+
+/* ══ 1: PURE OLD iOS ══ */
+.ios { background: #F2F2F7; color: #1C1C1E; }
+.ios .status-bar { color: #1C1C1E; }
+.ios .chat-header { background: rgba(242,242,247,0.97); border-bottom: 0.5px solid rgba(0,0,0,0.16); }
+.ios .back-btn, .ios .contact-name, .ios .header-actions { color: #007AFF; }
+.ios .header-actions { opacity: 1; }
+
+.ios .msg.sent .bubble {
+  background: linear-gradient(180deg, #62C1FF 0%, #1F96FF 20%, #0177FF 48%, #005CE5 75%, #004BBE 100%);
+  color: white; text-shadow: 0 1px 1px rgba(0,0,0,0.18);
+  border-radius: 17px 17px 4px 17px;
+  box-shadow: inset 0 1.5px 2px rgba(255,255,255,0.45), inset 0 -1.5px 2px rgba(0,0,0,0.22), 0 2px 8px rgba(0,100,230,0.38), 0 1px 2px rgba(0,0,0,0.22);
+}
+.ios .msg.sent .bubble::after {
+  content: ''; position: absolute; bottom: 0; right: -7px; width: 13px; height: 15px;
+  background: #004BBE; clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+.ios .msg.received .bubble {
+  background: linear-gradient(180deg, #FAFAFA 0%, #EBEBEF 32%, #DCDCE0 68%, #CACACE 100%);
+  color: #1C1C1E; border-radius: 17px 17px 17px 4px;
+  box-shadow: inset 0 1.5px 2px rgba(255,255,255,0.85), inset 0 -1px 2px rgba(0,0,0,0.09), 0 2px 5px rgba(0,0,0,0.14);
+}
+.ios .msg.received .bubble::after {
+  content: ''; position: absolute; bottom: 0; left: -7px; width: 13px; height: 15px;
+  background: #CACACE; clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+.ios .date-pill  { background: rgba(0,0,0,0.07); color: rgba(0,0,0,0.44); }
+.ios .input-bar  { background: rgba(242,242,247,0.97); border-top: 0.5px solid rgba(0,0,0,0.14); }
+.ios .input-wrap { background: white; border: 1px solid #D0D0D5; color: rgba(0,0,0,0.32); }
+.ios .send-btn   { background: #007AFF; color: white; }
+.ios .msg-time   { color: rgba(0,0,0,0.38) !important; }
+.ios .delivered  { color: rgba(0,0,0,0.38); }
+.ios .avatar     { background: linear-gradient(135deg, #62C1FF, #0076FF); }
+
+
+/* ══ 2: LIQUID GLASS ══ */
+.glass-phone { background: linear-gradient(145deg, #0E0726 0%, #1B0E3D 40%, #0F1535 70%, #0A1225 100%); color: white; position: relative; }
+.glass-phone .blob { position: absolute; border-radius: 50%; pointer-events: none; z-index: 0; }
+.glass-phone .blob-a { top: 18%; left: 0;    width: 160px; height: 160px; background: radial-gradient(circle, rgba(130,70,255,0.38) 0%, transparent 70%); }
+.glass-phone .blob-b { bottom: 22%; right: -5%; width: 130px; height: 130px; background: radial-gradient(circle, rgba(50,110,255,0.32) 0%, transparent 70%); }
+.glass-phone .blob-c { top: 55%; left: 30%; width: 80px; height: 80px; background: radial-gradient(circle, rgba(200,80,255,0.18) 0%, transparent 70%); }
+.glass-phone .status-bar,
+.glass-phone .chat-header,
+.glass-phone .messages,
+.glass-phone .input-bar { position: relative; z-index: 1; }
+.glass-phone .status-bar { color: rgba(255,255,255,0.92); }
+.glass-phone .chat-header { background: rgba(255,255,255,0.07); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); border-bottom: 1px solid rgba(255,255,255,0.1); }
+.glass-phone .back-btn       { color: rgba(255,255,255,0.75); }
+.glass-phone .contact-name   { color: white; }
+.glass-phone .header-actions { color: rgba(255,255,255,0.65); opacity: 1; }
+
+.glass-phone .msg.sent .bubble {
+  background: linear-gradient(145deg, rgba(120,80,255,0.52) 0%, rgba(85,55,215,0.44) 100%);
+  backdrop-filter: blur(22px) saturate(180%); -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.24); border-bottom-color: rgba(255,255,255,0.08);
+  color: white; border-radius: 17px 17px 4px 17px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.28), 0 8px 32px rgba(110,70,230,0.28), 0 2px 8px rgba(0,0,0,0.28);
+}
+.glass-phone .msg.sent .bubble::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 44%;
+  border-radius: 16px 16px 0 0; background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent); pointer-events: none;
+}
+.glass-phone .msg.received .bubble {
+  background: rgba(255,255,255,0.09);
+  backdrop-filter: blur(22px) saturate(180%); -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.14); border-bottom-color: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.92); border-radius: 17px 17px 17px 4px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 16px rgba(0,0,0,0.22);
+}
+.glass-phone .msg.received .bubble::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 44%;
+  border-radius: 16px 16px 0 0; background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent); pointer-events: none;
+}
+.glass-phone .date-pill  { background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); color: rgba(255,255,255,0.48); border: 1px solid rgba(255,255,255,0.1); }
+.glass-phone .input-bar  { background: rgba(255,255,255,0.06); backdrop-filter: blur(28px); border-top: 1px solid rgba(255,255,255,0.09); }
+.glass-phone .input-wrap { background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.13); color: rgba(255,255,255,0.38); }
+.glass-phone .send-btn   { background: linear-gradient(145deg, rgba(130,90,255,0.85), rgba(90,60,210,0.85)); border: 1px solid rgba(255,255,255,0.22); color: white; box-shadow: 0 4px 16px rgba(110,70,230,0.45); }
+.glass-phone .msg-time   { color: rgba(255,255,255,0.4) !important; }
+.glass-phone .delivered  { color: rgba(255,255,255,0.32); }
+.glass-phone .avatar { background: linear-gradient(135deg, rgba(130,90,255,0.75), rgba(90,60,210,0.75)); border: 1px solid rgba(255,255,255,0.2); }
+
+
+/* ══ 3: FUTURISTIC NOSTALGIA ══ */
+.neo-phone { background: #080C18; color: white; }
+.neo-phone .status-bar { color: rgba(255,255,255,0.78); }
+.neo-phone .chat-header { background: rgba(8,12,24,0.96); border-bottom: 1px solid rgba(30,100,255,0.16); }
+.neo-phone .back-btn, .neo-phone .contact-name, .neo-phone .header-actions { color: #5BA4FF; }
+.neo-phone .header-actions { opacity: 1; }
+
+.neo-phone .msg.sent .bubble {
+  background: linear-gradient(155deg, #1E80FF 0%, #005AEE 45%, #0043C5 100%);
+  color: white; border-radius: 17px 17px 4px 17px;
+  border: 1px solid rgba(80,162,255,0.35); border-top-color: rgba(130,196,255,0.45);
+  box-shadow: inset 0 1.5px 2px rgba(255,255,255,0.22), inset 0 -1.5px 2px rgba(0,0,0,0.28), 0 0 14px rgba(30,128,255,0.42), 0 4px 18px rgba(0,0,0,0.5);
+}
+.neo-phone .msg.sent .bubble::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 46%;
+  border-radius: 16px 16px 0 0; background: linear-gradient(to bottom, rgba(255,255,255,0.17), transparent); pointer-events: none;
+}
+.neo-phone .msg.sent .bubble::after {
+  content: ''; position: absolute; bottom: 0; right: -7px; width: 13px; height: 14px;
+  background: #0043C5; clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+.neo-phone .msg.received .bubble {
+  background: linear-gradient(155deg, rgba(22,32,58,0.98) 0%, rgba(15,22,42,1) 100%);
+  color: #C5DCFF; border-radius: 17px 17px 17px 4px;
+  border: 1px solid rgba(55,115,255,0.2); border-top-color: rgba(80,145,255,0.25);
+  box-shadow: inset 0 1px 0 rgba(100,165,255,0.1), 0 4px 18px rgba(0,0,0,0.55);
+}
+.neo-phone .msg.received .bubble::after {
+  content: ''; position: absolute; bottom: 0; left: -7px; width: 13px; height: 14px;
+  background: rgba(15,22,42,1); clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+.neo-phone .date-pill  { background: rgba(30,128,255,0.1); color: rgba(91,164,255,0.65); border: 1px solid rgba(30,128,255,0.22); }
+.neo-phone .input-bar  { background: rgba(8,12,24,0.98); border-top: 1px solid rgba(30,100,255,0.16); }
+.neo-phone .input-wrap { background: rgba(18,28,52,0.8); border: 1px solid rgba(30,100,255,0.2); color: rgba(197,220,255,0.32); }
+.neo-phone .send-btn   { background: linear-gradient(145deg, #1E80FF, #0043C5); color: white; box-shadow: 0 0 16px rgba(30,128,255,0.58), 0 3px 8px rgba(0,0,0,0.45); }
+.neo-phone .msg-time   { color: rgba(197,220,255,0.35) !important; }
+.neo-phone .delivered  { color: rgba(197,220,255,0.28); }
+.neo-phone .avatar { background: linear-gradient(135deg, #1E80FF, #0043C5); }
+
+
+/* ══ 4: CLAY / PLUSH 3D ══ */
+.clay-phone { background: linear-gradient(155deg, #FFF8FF 0%, #F5EEFF 55%, #FDF0FF 100%); color: #2A1650; }
+.clay-phone .status-bar { color: #5C3098; }
+.clay-phone .chat-header { background: rgba(255,248,255,0.97); border-bottom: 1px solid rgba(170,120,220,0.12); }
+.clay-phone .back-btn, .clay-phone .contact-name { color: #7B2FE0; }
+.clay-phone .header-actions { color: #7B2FE0; opacity: 0.7; }
+.clay-phone .contact-status { color: #059669; }
+
+.clay-phone .msg.sent .bubble {
+  background: linear-gradient(145deg, #BB76FF 0%, #8E34F2 55%, #7620DA 100%);
+  color: white; border-radius: 20px 20px 6px 20px;
+  box-shadow:
+    inset 0 2.5px 3px rgba(255,255,255,0.40),
+    inset 0 -2px 5px rgba(0,0,0,0.20),
+    inset 2px 0 3px rgba(255,255,255,0.14),
+    0 5px 0 #5912B2,
+    0 7px 20px rgba(118,38,218,0.32),
+    0 2px 5px rgba(0,0,0,0.14);
+  transform: translateY(-1px);
+}
+.clay-phone .msg.sent .bubble::before {
+  content: ''; position: absolute; top: 3px; left: 5px; right: 5px; height: 38%;
+  border-radius: 18px 18px 6px 6px; background: linear-gradient(to bottom, rgba(255,255,255,0.34), transparent); pointer-events: none;
+}
+.clay-phone .msg.received .bubble {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F4EAFF 55%, #EDE0FF 100%);
+  color: #38196A; border-radius: 20px 20px 20px 6px;
+  border: 1px solid rgba(165,115,225,0.18);
+  box-shadow:
+    inset 0 2.5px 4px rgba(255,255,255,0.95),
+    inset 0 -2px 5px rgba(165,115,225,0.18),
+    0 5px 0 rgba(165,115,225,0.24),
+    0 7px 20px rgba(165,115,225,0.13),
+    0 2px 4px rgba(0,0,0,0.05);
+  transform: translateY(-1px);
+}
+.clay-phone .msg.received .bubble::before {
+  content: ''; position: absolute; top: 3px; left: 5px; right: 5px; height: 38%;
+  border-radius: 18px 18px 6px 6px; background: linear-gradient(to bottom, rgba(255,255,255,0.82), transparent); pointer-events: none;
+}
+.clay-phone .date-pill  { background: rgba(158,112,240,0.11); color: rgba(104,48,180,0.62); border: 1px solid rgba(158,112,240,0.18); }
+.clay-phone .input-bar  { background: rgba(255,248,255,0.97); border-top: 1px solid rgba(165,115,225,0.12); }
+.clay-phone .input-wrap { background: white; border: 1.5px solid rgba(158,112,240,0.18); color: rgba(52,22,100,0.32); box-shadow: inset 0 2px 4px rgba(158,112,240,0.08); }
+.clay-phone .send-btn   { background: linear-gradient(145deg, #BB76FF, #8E34F2); color: white; box-shadow: 0 4px 0 #5912B2, 0 6px 16px rgba(118,38,218,0.38); transform: translateY(-2px); }
+.clay-phone .msg.sent     .msg-time { color: rgba(255,255,255,0.52) !important; }
+.clay-phone .msg.received .msg-time { color: rgba(52,22,100,0.38) !important; }
+.clay-phone .delivered { color: rgba(52,22,100,0.32); }
+.clay-phone .avatar { background: linear-gradient(135deg, #BB76FF, #8E34F2); box-shadow: 0 3px 0 #5912B2; }
+</style>
+</head>
+<body>
+
+<h1>Chat Bubble Styles</h1>
+<p class="page-sub">Pure iOS gloss &nbsp;·&nbsp; liquid glass &nbsp;·&nbsp; retro-future &nbsp;·&nbsp; clay 3D</p>
+
+<div class="grid">
+
+  <div class="col">
+    <div class="phone ios">
+      <div class="status-bar"><span>9:41</span><span>▲ ●●● ■</span></div>
+      <div class="chat-header">
+        <span class="back-btn">‹</span>
+        <div class="avatar">S</div>
+        <div><div class="contact-name">Sarah</div><div class="contact-status">online</div></div>
+        <div class="header-actions"><span>⊙</span><span>···</span></div>
+      </div>
+      <div class="messages">
+        <div class="date-pill">Today</div>
+        <div class="msg received"><div class="bubble">Hey! Did you finish the report? 📋</div><span class="msg-time">2:31 PM</span></div>
+        <div class="msg sent"><span class="msg-time">2:33 PM</span><div class="bubble">Almost done, just reviewing it now</div></div>
+        <div class="msg sent"><span class="msg-time">2:33 PM</span><div class="bubble">Will send in 10 min 👍</div></div>
+        <div class="msg received"><div class="bubble">Perfect, no rush!</div><span class="msg-time">2:35 PM</span></div>
+        <div class="msg sent"><span class="msg-time">2:41 PM</span><div class="bubble">Sent! Let me know if you need changes</div></div>
+        <div class="delivered">Delivered</div>
+      </div>
+      <div class="input-bar"><div class="input-wrap"><span>😊</span><span>iMessage</span></div><div class="send-btn">↑</div></div>
+    </div>
+    <div class="style-name">Pure Old iOS</div>
+    <div class="style-sub">Glossy gradient · Hook tail · iOS 6–7 iMessage</div>
+  </div>
+
+  <div class="col">
+    <div class="phone glass-phone">
+      <div class="blob blob-a"></div><div class="blob blob-b"></div><div class="blob blob-c"></div>
+      <div class="status-bar"><span>9:41</span><span>▲ ●●● ■</span></div>
+      <div class="chat-header">
+        <span class="back-btn">‹</span>
+        <div class="avatar">S</div>
+        <div><div class="contact-name">Sarah</div><div class="contact-status">online</div></div>
+        <div class="header-actions"><span>⊙</span><span>···</span></div>
+      </div>
+      <div class="messages">
+        <div class="date-pill">Today</div>
+        <div class="msg received"><div class="bubble">Hey! Did you finish the report? 📋</div><span class="msg-time">2:31 PM</span></div>
+        <div class="msg sent"><span class="msg-time">2:33 PM</span><div class="bubble">Almost done, just reviewing it now</div></div>
+        <div class="msg sent"><span class="msg-time">2:33 PM</span><div class="bubble">Will send in 10 min 👍</div></div>
+        <div class="msg received"><div class="bubble">Perfect, no rush!</div><span class="msg-time">2:35 PM</span></div>
+        <div class="msg sent"><span class="msg-time">2:41 PM</span><div class="bubble">Sent! Let me know if changes needed</div></div>
+        <div class="delivered" style="color:rgba(255,255,255,0.32)">Delivered</div>
+      </div>
+      <div class="input-bar"><div class="input-wrap"><span>😊</span><span>Message</span></div><div class="send-btn">↑</div></div>
+    </div>
+    <div class="style-name">Liquid Glass</div>
+    <div class="style-sub">Frosted glass · Backdrop blur · iOS 26 / visionOS</div>
+  </div>
+
+  <div class="col">
+    <div class="phone neo-phone">
+      <div class="status-bar"><span>9:41</span><span>▲ ●●● ■</span></div>
+      <div class="chat-header">
+        <span class="back-btn">‹</span>
+        <div class="avatar">S</div>
+        <div><div class="contact-name">Sarah</div><div class="contact-status">online</div></div>
+        <div class="header-actions"><span>⊙</span><span>···</span></div>
+      </div>
+      <div class="messages">
+        <div class="date-pill">Today</div>
+        <div class="msg received"><div class="bubble">Hey! Did you finish the report? 📋</div><span class="msg-time">2:31 PM</span></div>
+        <div class="msg sent"><span class="msg-time">2:33 PM</span><div class="bubble">Almost done, just reviewing it now</div></div>
+        <div class="msg sent"><span class="msg-time">2:33 PM</span><div class="bubble">Will send in 10 min 👍</div></div>
+        <div class="msg received"><div class="bubble">Perfect, no rush!</div><span class="msg-time">2:35 PM</span></div>
+        <div class="msg sent"><span class="msg-time">2:41 PM</span><div class="bubble">Sent! Let me know if changes needed</div></div>
+        <div class="delivered">Delivered</div>
+      </div>
+      <div class="input-bar"><div class="input-wrap"><span>😊</span><span>Message</span></div><div class="send-btn">↑</div></div>
+    </div>
+    <div class="style-name">Futuristic Nostalgia</div>
+    <div class="style-sub">Classic blue shape · Neon glow · Retro-future dark</div>
+  </div>
+
+  <div class="col">
+    <div class="phone clay-phone">
+      <div class="status-bar"><span>9:41</span><span>▲ ●●● ■</span></div>
+      <div class="chat-header">
+        <span class="back-btn">‹</span>
+        <div class="avatar">S</div>
+        <div><div class="contact-name">Sarah</div><div class="contact-status">online</div></div>
+        <div class="header-actions"><span>⊙</span><span>···</span></div>
+      </div>
+      <div class="messages">
+        <div class="date-pill">Today</div>
+        <div class="msg received"><div class="bubble">Hey! Did you finish the report? 📋</div><span class="msg-time">2:31 PM</span></div>
+        <div class="msg sent"><span class="msg-time">2:33 PM</span><div class="bubble">Almost done, just reviewing it now</div></div>
+        <div class="msg sent"><span class="msg-time">2:33 PM</span><div class="bubble">Will send in 10 min 👍</div></div>
+        <div class="msg received"><div class="bubble">Perfect, no rush!</div><span class="msg-time">2:35 PM</span></div>
+        <div class="msg sent"><span class="msg-time">2:41 PM</span><div class="bubble">Sent! Let me know if changes needed</div></div>
+        <div class="delivered">Delivered</div>
+      </div>
+      <div class="input-bar"><div class="input-wrap"><span>😊</span><span>Message</span></div><div class="send-btn">↑</div></div>
+    </div>
+    <div class="style-name">Clay / Plush 3D <span style="opacity:0.45;font-weight:500">— Claude's pick</span></div>
+    <div class="style-sub">Tactile depth · Inner glow · Raised floor shadow</div>
+  </div>
+
+</div>
+</body>
+</html>

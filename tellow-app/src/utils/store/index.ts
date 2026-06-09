@@ -5,6 +5,7 @@ import usersSlice from "./usersSlice";
 import chatsSlice from "./chatsSlice";
 import chatMessagesSlice from "./chatMessagesSlice";
 import statusSlice from "./statusSlice";
+import contactsSlice from "./contactsSlice";
 
 export const store = configureStore({
 	reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
 		chats: chatsSlice,
 		messages: chatMessagesSlice,
 		statuses: statusSlice,
+		contacts: contactsSlice,
 	},
 });
 

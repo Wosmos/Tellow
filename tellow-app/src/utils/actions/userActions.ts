@@ -7,7 +7,7 @@ export const searchUsers = async (queryText: string) => {
 		const { data, error } = await supabase
 			.from("users")
 			.select("*")
-			.ilike("first_last", `${searchTerm}%`);
+			.or(`first_last.ilike.${searchTerm}%,phone_number.ilike.${searchTerm}%`);
 
 		if (error) throw error;
 
@@ -22,6 +22,7 @@ export const searchUsers = async (queryText: string) => {
 				about: row.about || "",
 				profilePicture: row.profile_picture || "",
 				signUpDate: row.sign_up_date,
+				phoneNumber: row.phone_number || "",
 			};
 		});
 

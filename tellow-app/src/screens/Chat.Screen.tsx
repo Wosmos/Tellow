@@ -18,6 +18,7 @@ import { LoggedInStackParamList } from "../navigation/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../constants";
 import { useAppSelector } from "../utils/store";
+import { selectChatMessages } from "../utils/store/selectors";
 import { createChat, editChatMessage, sendImage, sendTextMessage } from "../utils/actions/chatActions";
 import { Message } from "../utils/store/types";
 import ChatMessage from "../components/ChatMessage";
@@ -47,17 +48,7 @@ const ChatScreen = (props: Props) => {
 	const storedUsers = useAppSelector((state) => state.storedUsers.storedUsers);
 	const storedChats = useAppSelector((state) => state.chats.chatsData);
 
-	const chatMessages = useAppSelector((state) => {
-		if (!currentChatId) return [];
-		const chatMessagesData = state.messages.messagesData[currentChatId];
-		if (!chatMessagesData) return [];
-
-		const messageList: Message[] = [];
-		for (const key in chatMessagesData) {
-			messageList.push({ messageId: key, ...chatMessagesData[key] });
-		}
-		return messageList;
-	});
+	const chatMessages = useAppSelector((state) => selectChatMessages(state, currentChatId));
 
 	const chatData = (currentChatId && storedChats[currentChatId]) || props.route?.params || {};
 

@@ -23,10 +23,11 @@ const SettingsScreen = () => {
 	const lastName = userData?.lastName || "";
 	const email = userData?.email || "";
 	const about = userData?.about || "";
+	const phoneNumber = userData?.phoneNumber || "";
 
 	const initialState = {
-		inputValues: { firstName, lastName, email, about },
-		inputValidities: { firstName: undefined, lastName: undefined, email: undefined, about: undefined },
+		inputValues: { firstName, lastName, email, about, phoneNumber },
+		inputValidities: { firstName: undefined, lastName: undefined, email: undefined, about: undefined, phoneNumber: undefined },
 		formIsValid: false,
 	};
 
@@ -60,7 +61,7 @@ const SettingsScreen = () => {
 
 	const hasChanges = () => {
 		const v = formState.inputValues;
-		return v.firstName !== firstName || v.lastName !== lastName || v.email !== email || v.about !== about;
+		return v.firstName !== firstName || v.lastName !== lastName || v.email !== email || v.about !== about || v.phoneNumber !== phoneNumber;
 	};
 
 	const cardBg = theme.dark ? "rgba(255,255,255,0.06)" : theme.colors.background;
@@ -102,7 +103,7 @@ const SettingsScreen = () => {
 				<View style={[styles.divider, { backgroundColor: theme.dark ? "rgba(255,255,255,0.06)" : theme.colors.border }]} />
 				<InfoRow
 					icon={<Ionicons name="call-outline" size={20} color={theme.colors.textSecondary} />}
-					value="Not set"
+					value={phoneNumber || "Not set"}
 					label="Phone"
 					theme={theme}
 				/>
@@ -132,6 +133,11 @@ const SettingsScreen = () => {
 						id="about" label="About" icon="user-o" iconPack={FontAwesome}
 						onInputChanged={inputChangedHandler} autoCapitalize="none"
 						errorText={formState.inputValidities["about"]} initialValue={about}
+					/>
+					<Input
+						id="phoneNumber" label="Phone (optional)" icon="phone" iconPack={Feather}
+						onInputChanged={inputChangedHandler} keyboardType="phone-pad"
+						errorText={formState.inputValidities["phoneNumber"]} initialValue={phoneNumber}
 					/>
 					{showSuccessMessage && <Text style={[styles.savedText, { color: theme.colors.online }]}>Saved!</Text>}
 					{loading ? (

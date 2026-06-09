@@ -10,6 +10,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { searchUsers } from "../utils/actions/userActions";
 import UserItem from "../components/UserItem";
 import { useAppDispatch, useAppSelector } from "../utils/store";
+import { selectChatsArray } from "../utils/store/selectors";
 import { UserData, Users } from "../utils/store/types";
 import { setStoredUsers } from "../utils/store/usersSlice";
 import UserImage from "../components/UserImage";
@@ -36,10 +37,7 @@ const NewChatScreen = (props: Props) => {
 
 	const userData = useAppSelector((state) => state.auth.userData)!; // current logged in user
 	const storedUsers = useAppSelector((state) => state.storedUsers.storedUsers);
-	const userChats = useAppSelector((state) => {
-		const chatsData = state.chats.chatsData;
-		return Object.values(chatsData);
-	});
+	const userChats = useAppSelector(selectChatsArray);
 
 	const isGroupChat = props.route.params.isGroupChat;
 

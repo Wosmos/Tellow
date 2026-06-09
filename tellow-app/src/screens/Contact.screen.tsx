@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../constants";
-import { useAppSelector } from "../utils/store";
+import { useAppDispatch, useAppSelector } from "../utils/store";
 import { StackScreenProps } from "@react-navigation/stack";
 import { LoggedInStackParamList } from "../navigation/types";
 import { getUserChats, removeUserFromChat } from "../utils/actions/chatActions";
+import { addContact, removeContact } from "../utils/actions/contactActions";
 import UserItem from "../components/UserItem";
 import SubmitButton from "../components/SubmitButton";
 
@@ -20,6 +21,9 @@ const ContactScreen = (props: Props) => {
 	const storedUsers = useAppSelector((state) => state.storedUsers.storedUsers);
 	const userData = useAppSelector((state) => state.auth.userData)!;
 	const storedChats = useAppSelector((state) => state.chats.chatsData);
+	const contacts = useAppSelector((state) => state.contacts.contacts);
+	const isContact = !!contacts[props.route.params.userId];
+	const dispatch = useAppDispatch();
 	const currentUser = storedUsers[props.route.params.userId];
 
 	const chatId = props.route.params.chatId;
@@ -94,6 +98,44 @@ const ContactScreen = (props: Props) => {
 					}}
 				>
 					<Ionicons name="chatbubble" size={20} color="#fff" />
+				</TouchableOpacity>
+			</View>
+
+			{/* Add / Remove contact */}
+			<View style={styles.contactBtnRow}>
+				<TouchableOpacity
+					style={[styles.contactBtn, { borderColor: isContact ? theme.colors.red : theme.colors.primary }]}
+					onPress={async () => {
+						if (isContact) {
+							Alert.alert(
+								"Remove Contact",
+								`Remove ${currentUser.firstName} ${currentUser.lastName}?`,
+								[
+									{ text: "Cancel", style: "cancel" },
+									{
+										text: "Remove",
+										style: "destructive",
+										onPress: () => dispatch(removeContact(userData.userId, currentUser.userId)),
+									},
+								]
+							);
+						} else {
+							try {
+								await dispatch(addContact(userData.userId, currentUser));
+							} catch (e: any) {
+								Alert.alert("Error", e.message);
+							}
+						}
+					}}
+				>
+					<Ionicons
+						name={isContact ? "person-remove-outline" : "person-add-outline"}
+						size={16}
+						color={isContact ? theme.colors.red : theme.colors.primary}
+					/>
+					<Text style={[styles.contactBtnText, { color: isContact ? theme.colors.red : theme.colors.primary }]}>
+						{isContact ? "Remove Contact" : "Add Contact"}
+					</Text>
 				</TouchableOpacity>
 			</View>
 
@@ -231,6 +273,24 @@ const styles = StyleSheet.create({
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.2,
 		shadowRadius: 4,
+	},
+	contactBtnRow: {
+		paddingHorizontal: 20,
+		marginTop: 12,
+	},
+	contactBtn: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 6,
+		alignSelf: "flex-start",
+		paddingHorizontal: 14,
+		paddingVertical: 8,
+		borderRadius: 20,
+		borderWidth: 1,
+	},
+	contactBtnText: {
+		fontSize: 14,
+		fontFamily: "medium",
 	},
 	infoSection: {
 		paddingHorizontal: 20,

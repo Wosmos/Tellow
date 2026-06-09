@@ -10,12 +10,13 @@ import { useAppDispatch } from "../utils/store";
 import { useTheme } from "../constants";
 
 const initialState = {
-  inputValues: { firstName: "", lastName: "", email: "", password: "" },
+  inputValues: { firstName: "", lastName: "", email: "", password: "", phoneNumber: "" },
   inputValidities: {
     firstName: undefined,
     lastName: undefined,
     email: undefined,
     password: undefined,
+    phoneNumber: undefined,
   },
   formIsValid: false,
 };
@@ -45,6 +46,7 @@ const SignUpForm = () => {
           lastName: formState.inputValues.lastName,
           email: formState.inputValues.email,
           password: formState.inputValues.password,
+          phoneNumber: formState.inputValues.phoneNumber || undefined,
         }),
       );
       setLoading(false);
@@ -110,6 +112,16 @@ const SignUpForm = () => {
         iconPack={Feather}
         onInputChanged={inputChangedHandler}
         errorText={formState.inputValidities["password"]}
+      />
+
+      <Input
+        id="phoneNumber"
+        label="Phone (optional)"
+        icon="phone"
+        iconPack={Feather}
+        onInputChanged={inputChangedHandler}
+        keyboardType="phone-pad"
+        errorText={formState.inputValidities["phoneNumber"]}
       />
 
       {loading ? (

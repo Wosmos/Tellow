@@ -52,6 +52,12 @@ export const validatePassword: ValidateFn = (id, value) => {
 	return validationResult && validationResult[id];
 };
 
+export const validatePhone: ValidateFn = (_id, value) => {
+	if (value === "") return undefined;
+	const valid = /^\+?[0-9]{7,15}$/.test(value);
+	return valid ? undefined : ["Phone must be 7–15 digits (optional + prefix)"];
+};
+
 export const validateLength = (id: string, value: string, minLength: number, maxLength: number, allowEmpty: boolean) => {
 	const constraints = {
 		presence: { allowEmpty },

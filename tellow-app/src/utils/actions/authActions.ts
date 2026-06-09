@@ -11,6 +11,7 @@ type SignUpParams = {
 	password: string;
 	firstName: string;
 	lastName: string;
+	phoneNumber?: string;
 };
 
 type SignInParams = {
@@ -23,7 +24,7 @@ let timer: NodeJS.Timeout;
 export const signUp = (credentials: SignUpParams) => {
 	return async (dispatch: ApplicationDispatch) => {
 		try {
-			const { email, password, firstName, lastName } = credentials;
+			const { email, password, firstName, lastName, phoneNumber } = credentials;
 
 			const { data: authData, error: authError } = await supabase.auth.signUp({
 				email,
@@ -40,7 +41,7 @@ export const signUp = (credentials: SignUpParams) => {
 			const token = authData.session.access_token;
 			const expiryDate = new Date(authData.session.expires_at! * 1000);
 
-			const userData = await createUser({ firstName, lastName, email, userId });
+			const userData = await createUser({ firstName, lastName, email, userId, phoneNumber });
 
 			saveDataToStorage({ token, userId, expiryDate });
 
@@ -112,6 +113,7 @@ type UpdateSignedInUserDataParams = {
 	about?: string;
 	firstLast?: string;
 	profilePicture?: string;
+	phoneNumber?: string;
 };
 
 export const updateSignedInUserData = async (userId: string, newData: UpdateSignedInUserDataParams) => {
@@ -121,6 +123,7 @@ export const updateSignedInUserData = async (userId: string, newData: UpdateSign
 	if (newData.email !== undefined) updateData.email = newData.email;
 	if (newData.about !== undefined) updateData.about = newData.about;
 	if (newData.profilePicture !== undefined) updateData.profile_picture = newData.profilePicture;
+	if (newData.phoneNumber !== undefined) updateData.phone_number = newData.phoneNumber;
 
 	if (newData.firstName && newData.lastName) {
 		updateData.first_last = `${newData.firstName} ${newData.lastName}`.toLowerCase();
@@ -134,10 +137,11 @@ type CreateUserParams = {
 	lastName: string;
 	email: string;
 	userId: string;
+	phoneNumber?: string;
 };
 
 const createUser = async (data: CreateUserParams) => {
-	const { firstName, lastName, email, userId } = data;
+	const { firstName, lastName, email, userId, phoneNumber } = data;
 	const firstLast = `${firstName} ${lastName}`.toLowerCase();
 
 	const { error } = await supabase.from("users").upsert({
@@ -146,6 +150,7 @@ const createUser = async (data: CreateUserParams) => {
 		last_name: lastName,
 		first_last: firstLast,
 		email,
+		...(phoneNumber ? { phone_number: phoneNumber } : {}),
 	}, { onConflict: "user_id" });
 	if (error) throw error;
 
@@ -155,6 +160,7 @@ const createUser = async (data: CreateUserParams) => {
 		firstLast,
 		email,
 		userId,
+		phoneNumber: phoneNumber || "",
 		signUpDate: new Date().toISOString(),
 	};
 };
@@ -210,6 +216,7 @@ export const getUserData = async (userId: string) => {
 			email: data.email,
 			about: data.about || "",
 			profilePicture: data.profile_picture || "",
+			phoneNumber: data.phone_number || "",
 			signUpDate: data.sign_up_date,
 		};
 	} catch (error) {

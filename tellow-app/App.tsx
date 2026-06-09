@@ -1,4 +1,6 @@
 import "react-native-gesture-handler";
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["ViewPropTypes will be removed"]);
 import React, { useCallback, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { MenuProvider } from "react-native-popup-menu";

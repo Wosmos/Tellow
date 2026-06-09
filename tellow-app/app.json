@@ -24,11 +24,5 @@
 		"web": {
 			"favicon": "./assets/favicon.png"
 		},
-		"extra": {
-			"eas": {
-				"projectId": "1b169838-3ae6-464e-b816-04bcc8d939d1"
-			}
-		},
-		"owner": "salikmubeen"
 	}
 }

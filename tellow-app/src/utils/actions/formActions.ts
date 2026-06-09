@@ -1,4 +1,4 @@
-import { validateEmail, validateLength, validatePassword, validateString } from "../validationConstraints";
+import { validateEmail, validateLength, validatePassword, validatePhone, validateString } from "../validationConstraints";
 
 type ValidateFn = (id: string, value: string) => undefined | string[];
 
@@ -13,5 +13,7 @@ export const validateInput: ValidateFn = (inputId, inputValue) => {
 		return validateLength(inputId, inputValue, 0, 150, true);
 	} else if (inputId === "chatName") {
 		return validateLength(inputId, inputValue, 5, 50, false);
+	} else if (inputId === "phoneNumber") {
+		return validatePhone(inputId, inputValue);
 	}
 };
